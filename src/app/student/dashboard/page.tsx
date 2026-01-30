@@ -183,7 +183,7 @@ export default function StudentDashboard() {
                             <h2 className={styles.sectionTitle}>
                                 ⭐ Recommended For You
                             </h2>
-                            <Link href="/student/learn" className={styles.seeAllLink}>See All →</Link>
+                            <Link href="/student/library" className={styles.seeAllLink}>See All →</Link>
                         </div>
                         <div className={styles.recommendationsGrid}>
                             {recommendations.map((rec) => (
