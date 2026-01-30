@@ -12,7 +12,7 @@ const navLinks = [
     { href: '/teacher/classes', label: 'Classes' },
     { href: '/teacher/content', label: 'Content Management' },
     { href: '/teacher/analytics', label: 'Student Analytics' },
-    { href: '/teacher/profile', label: 'Profile' },
+
 ];
 
 export default function Navbar() {
@@ -114,10 +114,7 @@ export default function Navbar() {
                                 </div>
                                 <div className={styles.menuDivider} />
                                 <div className={styles.menuItems}>
-                                    <Link href="/teacher/profile" className={styles.menuItem}>
-                                        <span className={styles.menuIcon}>👤</span>
-                                        <span>My Profile</span>
-                                    </Link>
+
                                     <Link href="/teacher/settings" className={styles.menuItem}>
                                         <span className={styles.menuIcon}>⚙️</span>
                                         <span>Settings</span>

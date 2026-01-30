@@ -402,24 +402,33 @@
 }
 
 .previewOpen {
-    width: 400px;
+    width: 450px;
 }
 
 /* Preview Content utils same as before */
 .previewHeader {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    padding: 16px 20px;
+    background: #fafbfc;
     border-bottom: 1px solid #e2e8f0;
-    min-width: 400px;
+    min-width: 450px;
 }
 
 .previewHeader h3 {
     margin: 0;
     font-size: 1rem;
-    font-weight: 600;
-    color: #1e293b;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.previewHeader h3::before {
+    content: "👁️";
 }
 
 .closeBtn {
@@ -438,16 +447,38 @@
 }
 
 .closeBtn:hover {
-    background: #f1f5f9;
+    background: #fee2e2;
     color: #ef4444;
 }
 
 .previewContent {
     flex: 1;
-    padding: 24px;
+    padding: 20px;
     overflow-y: auto;
-    background: #fcffff;
-    min-width: 400px;
+    overflow-x: hidden;
+    background: #f8fafc;
+    min-width: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.outputResult {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.outputResult h4 {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .executing {
@@ -470,7 +501,6 @@
     margin-bottom: 20px;
 }
 
-.outputResult h4,
 .logsSection h4 {
     font-size: 0.75rem;
     font-weight: 700;
