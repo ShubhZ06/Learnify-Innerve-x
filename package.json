@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.80",
     "@xyflow/react": "^12.10.0",
     "axios": "^1.13.4",
     "bcrypt": "^6.0.0",

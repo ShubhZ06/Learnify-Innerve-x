@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Navbar from '@/components/student/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
+import { useWebLLM } from '@/hooks/useWebLLM';
 import styles from './page.module.css';
 
 interface Message {
@@ -20,6 +21,9 @@ export default function AITutorPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
+    // WebLLM integration
+    const { isLoading, isReady, progress, error, initializeModel, chat } = useWebLLM();
+
     const quickActions = [
         { label: t('explainTopic'), icon: '📚' },
         { label: t('solveProblem'), icon: '🧮' },
@@ -35,9 +39,15 @@ export default function AITutorPage() {
         scrollToBottom();
     }, [messages]);
 
-    const handleSend = (text?: string) => {
+    const handleSend = async (text?: string) => {
         const messageText = text || inputText;
         if (!messageText.trim()) return;
+
+        // Check if model is ready
+        if (!isReady) {
+            alert('Please load the model first by clicking the "Load Model" button');
+            return;
+        }
 
         const newMessage: Message = {
             id: Date.now(),
@@ -49,36 +59,38 @@ export default function AITutorPage() {
         setInputText('');
         setIsTyping(true);
 
-        // Simulate AI response
-        setTimeout(() => {
-            const aiResponse: Message = {
-                id: Date.now() + 1,
+        try {
+            // Create a placeholder message for streaming updates
+            const aiMessageId = Date.now() + 1;
+            const aiMessage: Message = {
+                id: aiMessageId,
                 type: 'ai',
-                content: generateResponse(messageText),
+                content: '',
             };
-            setMessages(prev => [...prev, aiResponse]);
+            setMessages(prev => [...prev, aiMessage]);
+
+            // Get response from WebLLM with streaming
+            await chat(messageText, (streamedText) => {
+                // Update the AI message with streamed content
+                setMessages(prev =>
+                    prev.map(msg =>
+                        msg.id === aiMessageId
+                            ? { ...msg, content: streamedText }
+                            : msg
+                    )
+                );
+            });
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            const errorResponse: Message = {
+                id: Date.now() + 2,
+                type: 'ai',
+                content: `Error: ${errorMessage}. Please make sure the model is loaded.`,
+            };
+            setMessages(prev => [...prev, errorResponse]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
-    };
-
-    const generateResponse = (query: string) => {
-        return `Here's my response to "${query}":
-
-**Understanding the Concept:**
-This is an important topic that covers fundamental principles. Let me break it down step by step.
-
-**Key Points:**
-• First, we need to understand the basic definition
-• Next, we explore how this applies in practice
-• Finally, we can solve related problems
-
-**Example:**
-Let's consider a simple example to illustrate this concept...
-
-**Practice Tip:**
-Try solving 2-3 similar problems to reinforce your understanding.
-
-*This is an offline AI response. For more detailed explanations, please connect to the internet.*`;
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -120,9 +132,31 @@ Try solving 2-3 similar problems to reinforce your understanding.
                         </div>
                         <div className={styles.headerRight}>
                             <div className={styles.offlineTag}>
-                                <span className={styles.offlineDot}></span>
-                                {t('offlineMode')}
+                                <span className={styles.offlineDot} style={{
+                                    backgroundColor: isReady ? '#10b981' : isLoading ? '#f59e0b' : '#6b7280'
+                                }}></span>
+                                {isReady ? 'Model Ready' : isLoading ? 'Loading...' : 'Model Not Loaded'}
                             </div>
+                            {!isReady && !isLoading && (
+                                <button
+                                    className={styles.clearBtn}
+                                    onClick={initializeModel}
+                                    style={{ marginLeft: '8px' }}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                        <path d="M3 3v5h5" />
+                                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                                        <path d="M16 21h5v-5" />
+                                    </svg>
+                                    Load Model
+                                </button>
+                            )}
+                            {error && (
+                                <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                                    Error: {error}
+                                </div>
+                            )}
                             {messages.length > 0 && (
                                 <button className={styles.clearBtn} onClick={handleNewChat}>
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -138,12 +172,42 @@ Try solving 2-3 similar problems to reinforce your understanding.
                     {messages.length === 0 ? (
                         <div className={styles.welcomeScreen}>
                             <div className={styles.welcomeCard}>
+                                {isLoading && (
+                                    <div style={{
+                                        marginBottom: '24px',
+                                        padding: '16px',
+                                        background: 'rgba(59, 130, 246, 0.1)',
+                                        borderRadius: '12px',
+                                        border: '1px solid rgba(59, 130, 246, 0.3)'
+                                    }}>
+                                        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#3b82f6' }}>
+                                            Loading Offline Model...
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
+                                            {progress}
+                                        </div>
+                                        <div style={{
+                                            width: '100%',
+                                            height: '4px',
+                                            background: '#e2e8f0',
+                                            borderRadius: '2px',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <div style={{
+                                                height: '100%',
+                                                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                                                animation: 'progress 1.5s ease-in-out infinite',
+                                                width: '40%'
+                                            }}></div>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className={styles.welcomeIcon}>✨</div>
                                 <h1 className={styles.welcomeTitle}>
                                     {t('hello')}, {userName}!
                                 </h1>
                                 <p className={styles.welcomeSubtitle}>
-                                    {t('whatToLearn')}
+                                    {isReady ? t('whatToLearn') : 'Please load the offline AI model to start learning'}
                                 </p>
 
                                 {/* Input Area */}
