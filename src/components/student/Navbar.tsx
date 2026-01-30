@@ -10,7 +10,7 @@ const navLinks = [
     { href: '/student/dashboard', label: 'Home' },
     { href: '/student/ai-tutor', label: 'Offline AI Tutor' },
     { href: '/student/library', label: 'Library' },
-    { href: '/student/practice', label: 'Practice' },
+    { href: '/student/classroom', label: 'Classroom' },
 ];
 
 const notifications = [
@@ -79,10 +79,13 @@ export default function Navbar() {
 
                 {/* Right Section */}
                 <div className={styles.rightSection}>
-                    {/* Streak Counter */}
-                    <div className={styles.streakBadge}>
-                        <span className={styles.fireIcon}>🔥</span>
-                        <span>12 Days</span>
+                    {/* Learning Streak */}
+                    <div className={styles.streakCounter}>
+                        <span className={styles.streakFlame}>🔥</span>
+                        <div className={styles.streakInfo}>
+                            <span className={styles.streakNumber}>0</span>
+                            <span className={styles.streakLabel}>Day Streak</span>
+                        </div>
                     </div>
 
                     {/* Notifications */}

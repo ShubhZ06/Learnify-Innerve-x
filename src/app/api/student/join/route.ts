@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import connectDB from "@/lib/db";
 import Classroom from "@/models/Classroom";
 import Enrollment from "@/models/Enrollment";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
     try {
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
 
         // 2. Check if already enrolled
         const existingEnrollment = await Enrollment.findOne({
-            studentId: session.user.id,
+            studentId: new mongoose.Types.ObjectId(session.user.id),
             classroomId: classroom._id,
         });
 
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
 
         // 3. Create enrollment
         const newEnrollment = new Enrollment({
-            studentId: session.user.id,
+            studentId: new mongoose.Types.ObjectId(session.user.id),
             classroomId: classroom._id,
         });
 
