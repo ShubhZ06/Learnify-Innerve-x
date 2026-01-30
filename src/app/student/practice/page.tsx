@@ -2,6 +2,7 @@
 
 import Navbar from '@/components/student/Navbar';
 import JoinClassroom from '@/components/student/JoinClassroom';
+import EnrolledClassrooms from '@/components/student/EnrolledClassrooms';
 import styles from './page.module.css';
 
 export default function PracticePage() {
@@ -14,12 +15,20 @@ export default function PracticePage() {
                     <p>Start your learning journey by choosing a practice session.</p>
                 </div>
 
-                <JoinClassroom />
+                <div className={styles.practiceLayout}>
+                    <div className={styles.mainContent}>
+                        <EnrolledClassrooms />
 
-                <div className={styles.emptyState}>
-                    <div className={styles.icon}>🎯</div>
-                    <h2>No practice sessions yet</h2>
-                    <p>Practice assignments and tests will appear here once assigned.</p>
+                        <div className={styles.emptyState}>
+                            <div className={styles.icon}>🎯</div>
+                            <h2>No practice sessions yet</h2>
+                            <p>Practice assignments and tests will appear here once assigned.</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.sidebar}>
+                        <JoinClassroom />
+                    </div>
                 </div>
             </div>
         </div>

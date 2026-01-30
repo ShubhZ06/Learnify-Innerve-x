@@ -1,0 +1,92 @@
+.container {
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+}
+
+.cardIcon {
+    font-size: 2rem;
+    background: #eff6ff;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+}
+
+.cardInfo {
+    flex: 1;
+}
+
+.className {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.25rem 0;
+}
+
+.teacherName {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+}
+
+.joinedDate {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.enterBtn {
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.enterBtn:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.loading {
+    text-align: center;
+    color: #6b7280;
+    padding: 2rem;
+    font-size: 0.875rem;
+}
