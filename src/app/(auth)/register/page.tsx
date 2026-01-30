@@ -32,11 +32,34 @@ export default function RegisterPage() {
         }
 
         setIsLoading(true);
-        // Simulate loading - no database connection yet
-        setTimeout(() => {
+        try {
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    role: role,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Registration successful! Redirecting to login...");
+                window.location.href = "/login";
+            } else {
+                alert(data.message || "Registration failed. Please try again.");
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            alert("An error occurred. Please try again later.");
+        } finally {
             setIsLoading(false);
-            alert(`Registration as ${role} functionality will be connected to database later!`);
-        }, 1000);
+        }
     };
 
     const getPasswordStrength = (password: string) => {
