@@ -299,7 +299,7 @@ export default function StudentDashboard() {
                     <div className={styles.widget}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginBottom: 0 }}>Assignments</h3>
-                            <Link href="/student/practice" style={{ color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 500 }}>See All</Link>
+                            <Link href="/student/classroom" style={{ color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 500 }}>See All</Link>
                         </div>
                         <div className={styles.assignmentsList}>
                             <p style={{

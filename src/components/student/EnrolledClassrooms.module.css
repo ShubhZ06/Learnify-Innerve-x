@@ -3,12 +3,133 @@
     margin-bottom: 3rem;
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
 .title {
     font-size: 1.25rem;
     font-weight: 700;
     color: #111827;
+    margin: 0;
+}
+
+.count {
+    font-size: 0.875rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* Join Form */
+.joinForm {
     margin-bottom: 1.5rem;
 }
+
+.joinInputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.joinInputWrapper:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.joinIcon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.joinInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9375rem;
+    color: #111827;
+    background: transparent;
+    font-family: monospace;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.joinInput::placeholder {
+    color: #9ca3af;
+    font-family: inherit;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.joinInput:disabled {
+    opacity: 0.5;
+}
+
+.joinBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.joinBtn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.joinBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    margin-top: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+}
+
+.emptyIcon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.5;
+}
+
+.emptyState p {
+    color: #6b7280;
+    font-size: 0.9375rem;
+    margin: 0;
+}
+
 
 .grid {
     display: grid;

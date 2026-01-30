@@ -4,6 +4,7 @@ import connectDB from "@/lib/db";
 import Enrollment from "@/models/Enrollment";
 import Classroom from "@/models/Classroom";
 import User from "@/models/User";
+import mongoose from "mongoose";
 
 export async function GET() {
     try {
@@ -18,8 +19,8 @@ export async function GET() {
 
         await connectDB();
 
-        // Find all classrooms this student is enrolled in
-        const enrollments = await Enrollment.find({ studentId: session.user.id })
+        // Try both string and ObjectId formats
+        let enrollments = await Enrollment.find({ studentId: session.user.id })
             .populate({
                 path: 'classroomId',
                 populate: {
@@ -28,6 +29,25 @@ export async function GET() {
                 }
             })
             .sort({ joinedAt: -1 });
+
+        // If no results with string, try ObjectId
+        if (enrollments.length === 0) {
+            try {
+                enrollments = await Enrollment.find({
+                    studentId: new mongoose.Types.ObjectId(session.user.id)
+                })
+                    .populate({
+                        path: 'classroomId',
+                        populate: {
+                            path: 'teacherId',
+                            select: 'name email'
+                        }
+                    })
+                    .sort({ joinedAt: -1 });
+            } catch (err) {
+                // Ignore invalid ObjectId
+            }
+        }
 
         const classrooms = enrollments.map(e => ({
             enrollmentId: e._id,

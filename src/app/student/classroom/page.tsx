@@ -11,7 +11,7 @@ export default function PracticePage() {
             <div className={styles.container}>
                 <div className={styles.header}>
                     <h1>Classroom</h1>
-                    <p>Start your learning journey by choosing our classroom </p>
+                    <p>Start your learning journey by choosing our classroom</p>
                 </div>
 
                 <EnrolledClassrooms />
