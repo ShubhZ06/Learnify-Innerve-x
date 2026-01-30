@@ -75,35 +75,40 @@ export async function executeNode(
     userInput: string
 ): Promise<string> {
     switch (node.node_type) {
-        case 'UserInput':
-            // UserInput node just passes through the initial user input
+        case 'Input':
+            // Input node passes through the initial user input
             return userInput;
 
-        case 'AIGenerate':
-            // Resolve references and call Gemini
+        case 'Process':
+            // Process node transforms/passes data from parent
+            // For now, just pass through - can be extended for real transformations
+            if (node.input_refs.length > 0) {
+                const ref = node.input_refs[0];
+                const cleanRef = ref.startsWith('@') ? ref.slice(1) : ref;
+                return nodeOutputs[cleanRef] || userInput;
+            }
+            return userInput;
+
+        case 'AI':
+            // AI node uses Gemini to generate content
             const prompt = node.prompt_template
                 ? resolveStepReferences(node.prompt_template, nodeOutputs, allNodes)
                 : userInput;
-            return await callGemini(prompt);
+
+            // Include user instruction if present
+            const fullPrompt = node.user_instruction
+                ? `${prompt}\n\nAdditional instructions: ${node.user_instruction}`
+                : prompt;
+
+            return await callGemini(fullPrompt);
 
         case 'Output':
-            // Output node returns the last referenced input or last node output
+            // Output node returns the last referenced input
             if (node.input_refs.length > 0) {
                 const ref = node.input_refs[node.input_refs.length - 1];
                 const cleanRef = ref.startsWith('@') ? ref.slice(1) : ref;
-
-                // Handle @Step format
-                if (cleanRef.toLowerCase().startsWith('step')) {
-                    const stepNum = parseInt(cleanRef.slice(4), 10);
-                    if (stepNum > 0 && stepNum <= allNodes.length) {
-                        const refNodeId = allNodes[stepNum - 1].node_id;
-                        return nodeOutputs[refNodeId] || 'No output available';
-                    }
-                }
-
                 return nodeOutputs[cleanRef] || 'No output available';
             }
-
             // Default: return the last non-output node's result
             const lastNodeId = allNodes.filter(n => n.node_type !== 'Output').pop()?.node_id;
             return lastNodeId ? nodeOutputs[lastNodeId] || 'No output available' : 'No output';
