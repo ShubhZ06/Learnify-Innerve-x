@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/student/Navbar';
@@ -33,7 +33,7 @@ const articles: Record<string, { title: string; subject: string; readTime: strin
     }
 };
 
-export default function ArticlePage() {
+function ArticleContent() {
     const searchParams = useSearchParams();
     const articleId = searchParams.get('id') || 'renaissance';
     const article = articles[articleId] || articles['renaissance'];
@@ -144,5 +144,20 @@ export default function ArticlePage() {
                 </article>
             </div>
         </div>
+    );
+}
+
+export default function ArticlePage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.articlePage}>
+                <Navbar />
+                <div className={styles.mainContainer}>
+                    Loading article...
+                </div>
+            </div>
+        }>
+            <ArticleContent />
+        </Suspense>
     );
 }

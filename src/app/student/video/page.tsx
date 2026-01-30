@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/student/Navbar';
@@ -38,7 +38,7 @@ const videoLessons: Record<string, { title: string; subject: string; duration: s
     }
 };
 
-export default function VideoLessonPage() {
+function VideoLessonContent() {
     const searchParams = useSearchParams();
     const lessonId = searchParams.get('id') || 'calculus';
     const lesson = videoLessons[lessonId] || videoLessons['calculus'];
@@ -165,5 +165,20 @@ export default function VideoLessonPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function VideoLessonPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.videoPage}>
+                <Navbar />
+                <div className={styles.mainContainer}>
+                    Loading video...
+                </div>
+            </div>
+        }>
+            <VideoLessonContent />
+        </Suspense>
     );
 }
