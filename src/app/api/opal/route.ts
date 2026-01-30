@@ -234,6 +234,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<OpalRespo
             });
         }
 
+        // Mode 3: Execute entire DAG
+        if (body.execute_dag && body.dag && body.user_input !== undefined) {
+            const { executeDAG } = await import('@/lib/workflow/runner');
+            const result = await executeDAG(body.dag, body.user_input);
+            return NextResponse.json({
+                success: result.success,
+                execution_result: result,
+                error: result.error
+            });
+        }
+
         return NextResponse.json({
             success: false,
             error: 'Invalid request. Provide app_idea to generate flow, or logic_flow with execute_step to run a step.'
