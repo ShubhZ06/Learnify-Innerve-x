@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/student/Navbar';
@@ -60,7 +60,7 @@ const quizzes: Record<string, { title: string; subject: string; totalQuestions: 
     }
 };
 
-export default function QuizPage() {
+function QuizContent() {
     const searchParams = useSearchParams();
     const quizId = searchParams.get('id') || 'biology';
     const quiz = quizzes[quizId] || quizzes['biology'];
@@ -264,5 +264,13 @@ export default function QuizPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function QuizPage() {
+    return (
+        <Suspense fallback={<div className={styles.quizPage}><Navbar /><div className={styles.mainContainer}>Loading quiz...</div></div>}>
+            <QuizContent />
+        </Suspense>
     );
 }

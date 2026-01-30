@@ -9,9 +9,6 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/
 
 interface GenerateWorkflowRequest {
     prompt: string;
-    options?: {
-        maxSteps?: number;
-    };
 }
 
 interface GenerateWorkflowResponse {
@@ -25,37 +22,63 @@ async function callGeminiArchitect(userPrompt: string): Promise<WorkflowDAG> {
         throw new Error('GEMINI_API_KEY is not configured');
     }
 
-    const architectPrompt = `You are the Opal-Lite Architect Agent. Your job is to translate natural language app ideas into a JSON Directed Acyclic Graph (DAG) workflow.
+    const architectPrompt = `You are the Opal-Lite Architect Agent. Your job is to translate natural language ideas into a JSON Directed Acyclic Graph (DAG) workflow.
 
-Available node types:
-- UserInput: Captures initial user input (always the first node)
-- AIGenerate: Processes data using AI generation with a prompt template
-- Output: Displays the final result (always the last node)
+Available node types with their purposes:
+- Input: Captures user input (MUST be the first node, one per workflow)
+- Process: Transforms, filters, or manipulates data (use for formatting, parsing, combining)
+- AI: Uses AI/LLM to generate content with a prompt_template
+- Output: Displays the final result (MUST be the last node, one per workflow)
 
-Rules:
-1. Every workflow MUST start with a UserInput node and end with an Output node
-2. Use @Step1, @Step2 etc. in prompt_template to reference previous node outputs
-3. Break complex tasks into logical steps (3-6 nodes is ideal)
-4. Each AIGenerate node should do ONE specific task
+STRICT RULES:
+1. Generate 3-6 interconnected nodes (minimum 3, maximum 6)
+2. MUST start with exactly ONE "Input" node
+3. MUST end with exactly ONE "Output" node  
+4. Use at least 1-2 "AI" nodes for intelligent processing
+5. Use "Process" nodes for data transformation between AI calls
+6. Each node MUST have a unique node_id, label, position, and config
+7. Use @node_id references in prompt_template (e.g., @input_1, @ai_1)
+8. Edges connect nodes - ensure proper data flow from Input to Output
+9. Position nodes with x increasing left-to-right (spacing ~300px)
 
-Example output format:
+Node config requirements:
+- Input: { "inputType": "text" | "file" | "json" }
+- Process: { "processType": "transform" | "filter" | "merge" | "split" }
+- AI: { "model": "gemini-2.5-flash", "temperature": 0.7 }
+- Output: { "outputFormat": "markdown" | "quiz_json" | "flashcard_json" }
+
+IMPORTANT:
+- If user asks for a QUIZ: 
+  - Set Output node config to { "outputFormat": "quiz_json" }
+  - The preceding AI node prompt MUST generate purely valid JSON with this structure: { "questions": [{ "question": "...", "options": ["A", "B", "C", "D"], "answer": "matched option string" }] }
+- If user asks for FLASHCARDS:
+  - Set Output node config to { "outputFormat": "flashcard_json" }
+  - The preceding AI node prompt MUST generate purely valid JSON: { "cards": [{ "front": "Term", "back": "Definition" }] }
+- Otherwise, default to Markdown.
+
+Example JSON structure:
 {
-  "id": "workflow_123",
+  "id": "workflow_${Date.now()}",
   "name": "Quiz Generator",
+  "description": "Creates quizzes on any topic",
   "nodes": [
-    {"node_id": "step_1", "node_type": "UserInput", "input_refs": [], "label": "Enter Topic", "prompt_template": ""},
-    {"node_id": "step_2", "node_type": "AIGenerate", "input_refs": ["@Step1"], "label": "Generate Questions", "prompt_template": "Create 5 quiz questions about: @Step1"},
-    {"node_id": "step_3", "node_type": "Output", "input_refs": ["@Step2"], "label": "Display Quiz"}
+    {"node_id": "input_1", "node_type": "Input", "label": "Topic Input", "input_refs": [], "position": {"x": 100, "y": 200}, "config": {"inputType": "text"}},
+    {"node_id": "ai_1", "node_type": "AI", "label": "Research Topic", "input_refs": ["@input_1"], "prompt_template": "Research key facts about: @input_1", "position": {"x": 400, "y": 150}, "config": {"model": "gemini-2.5-flash", "temperature": 0.7}},
+    {"node_id": "ai_2", "node_type": "AI", "label": "Generate Questions", "input_refs": ["@ai_1"], "prompt_template": "Based on this research: @ai_1\\n\\nCreate 5 multiple-choice quiz questions.", "position": {"x": 700, "y": 200}, "config": {"model": "gemini-2.5-flash", "temperature": 0.5}},
+    {"node_id": "process_1", "node_type": "Process", "label": "Format Quiz", "input_refs": ["@ai_2"], "position": {"x": 1000, "y": 200}, "config": {"processType": "transform"}},
+    {"node_id": "output_1", "node_type": "Output", "label": "Display Quiz", "input_refs": ["@process_1"], "position": {"x": 1300, "y": 200}, "config": {"outputFormat": "ui"}}
   ],
   "edges": [
-    {"id": "e1-2", "source": "step_1", "target": "step_2"},
-    {"id": "e2-3", "source": "step_2", "target": "step_3"}
+    {"id": "e1", "source": "input_1", "target": "ai_1", "type": "data"},
+    {"id": "e2", "source": "ai_1", "target": "ai_2", "type": "data"},
+    {"id": "e3", "source": "ai_2", "target": "process_1", "type": "data"},
+    {"id": "e4", "source": "process_1", "target": "output_1", "type": "data"}
   ]
 }
 
-User's app idea: "${userPrompt}"
+User's idea: "${userPrompt}"
 
-Output ONLY valid JSON, no markdown code blocks, no explanation:`;
+Output ONLY valid JSON. No markdown, no explanation:`;
 
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
         method: 'POST',
@@ -63,8 +86,8 @@ Output ONLY valid JSON, no markdown code blocks, no explanation:`;
         body: JSON.stringify({
             contents: [{ parts: [{ text: architectPrompt }] }],
             generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2048,
+                temperature: 0.4,
+                maxOutputTokens: 3000,
             }
         }),
     });
@@ -84,7 +107,7 @@ Output ONLY valid JSON, no markdown code blocks, no explanation:`;
     const textPart = candidates[0]?.content?.parts?.find((p: { text?: string }) => p.text);
     let jsonText = textPart?.text || '';
 
-    // Clean up response - remove markdown if present
+    // Clean up response
     jsonText = jsonText.trim();
     if (jsonText.startsWith('```json')) jsonText = jsonText.slice(7);
     if (jsonText.startsWith('```')) jsonText = jsonText.slice(3);
@@ -94,28 +117,45 @@ Output ONLY valid JSON, no markdown code blocks, no explanation:`;
     try {
         const dag = JSON.parse(jsonText);
 
-        // Validate required fields
+        // Validate and fill defaults
         if (!dag.id) dag.id = `workflow_${Date.now()}`;
         if (!dag.name) dag.name = 'Generated Workflow';
         if (!dag.nodes || !Array.isArray(dag.nodes)) throw new Error('Invalid nodes array');
         if (!dag.edges || !Array.isArray(dag.edges)) dag.edges = [];
 
-        // Add created_at
         dag.created_at = new Date().toISOString();
+
+        // Ensure all nodes have required fields
+        dag.nodes = dag.nodes.map((node: WorkflowNode, i: number) => ({
+            ...node,
+            node_id: node.node_id || `node_${i + 1}`,
+            status: 'idle',
+            position: node.position || { x: 100 + i * 300, y: 200 },
+            config: node.config || {},
+            input_refs: node.input_refs || []
+        }));
+
+        // Ensure all edges have type
+        dag.edges = dag.edges.map((edge: WorkflowEdge, i: number) => ({
+            ...edge,
+            id: edge.id || `e${i + 1}`,
+            type: edge.type || 'data'
+        }));
 
         // Auto-generate edges if missing
         if (dag.edges.length === 0 && dag.nodes.length > 1) {
             dag.edges = dag.nodes.slice(0, -1).map((node: WorkflowNode, i: number) => ({
-                id: `e${i + 1}-${i + 2}`,
+                id: `e${i + 1}`,
                 source: node.node_id,
-                target: dag.nodes[i + 1].node_id
+                target: dag.nodes[i + 1].node_id,
+                type: 'data'
             }));
         }
 
         return dag as WorkflowDAG;
     } catch (parseError) {
         console.error('Failed to parse DAG JSON:', jsonText);
-        throw new Error('Failed to parse workflow DAG from Gemini response');
+        throw new Error('Failed to parse workflow DAG');
     }
 }
 
@@ -151,6 +191,6 @@ export async function GET(): Promise<NextResponse> {
         status: 'ok',
         endpoint: '/api/generate-workflow',
         method: 'POST',
-        body: { prompt: 'string', options: { maxSteps: 'number (optional)' } }
+        body: { prompt: 'string' }
     });
 }

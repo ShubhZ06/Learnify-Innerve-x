@@ -1,3 +1,4 @@
+/* eslint-disable */
 const googlethis = require('googlethis');
 
 async function testRouteLogic(query) {
