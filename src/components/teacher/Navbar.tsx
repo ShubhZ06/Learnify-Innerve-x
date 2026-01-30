@@ -6,9 +6,11 @@ import styles from './Navbar.module.css';
 
 const navLinks = [
     { href: '/teacher/dashboard', label: 'Dashboard' },
-    { href: '/teacher/library', label: 'My Library' },
-    { href: '/teacher/community', label: 'Community' },
-    { href: '/teacher/settings', label: 'Settings' },
+    { href: '/teacher/ai-studio', label: 'AI Studio' },
+    { href: '/teacher/classes', label: 'Classes' },
+    { href: '/teacher/content', label: 'Content Management' },
+    { href: '/teacher/analytics', label: 'Student Analytics' },
+    { href: '/teacher/profile', label: 'Profile' },
 ];
 
 export default function Navbar() {
