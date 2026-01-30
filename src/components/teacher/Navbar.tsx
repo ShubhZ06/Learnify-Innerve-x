@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './Navbar.module.css';
 
 const navLinks = [
@@ -14,7 +16,20 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+    const { data: session } = useSession();
     const pathname = usePathname();
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const profileRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+                setShowProfileMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
         <nav className={styles.navbar}>
@@ -72,13 +87,53 @@ export default function Navbar() {
                     </button>
 
                     {/* Profile */}
-                    <button className={styles.profileBtn}>
-                        <img
-                            src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher"
-                            alt="Profile"
-                            className={styles.profileImg}
-                        />
-                    </button>
+                    <div className={styles.profileWrapper} ref={profileRef}>
+                        <button
+                            className={`${styles.profileBtn} ${showProfileMenu ? styles.active : ''}`}
+                            onClick={() => setShowProfileMenu(!showProfileMenu)}
+                        >
+                            <img
+                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher"
+                                alt="Profile"
+                                className={styles.profileImg}
+                            />
+                        </button>
+
+                        {showProfileMenu && (
+                            <div className={styles.profileDropdown}>
+                                <div className={styles.profileHeader}>
+                                    <img
+                                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher"
+                                        alt="Profile"
+                                        className={styles.dropdownAvatar}
+                                    />
+                                    <div className={styles.profileInfo}>
+                                        <span className={styles.profileName}>{session?.user?.name || 'Teacher'}</span>
+                                        <span className={styles.profileClass}>{session?.user?.email || 'shiksha@ai.com'}</span>
+                                    </div>
+                                </div>
+                                <div className={styles.menuDivider} />
+                                <div className={styles.menuItems}>
+                                    <Link href="/teacher/profile" className={styles.menuItem}>
+                                        <span className={styles.menuIcon}>👤</span>
+                                        <span>My Profile</span>
+                                    </Link>
+                                    <Link href="/teacher/settings" className={styles.menuItem}>
+                                        <span className={styles.menuIcon}>⚙️</span>
+                                        <span>Settings</span>
+                                    </Link>
+                                </div>
+                                <div className={styles.menuDivider} />
+                                <button
+                                    className={styles.logoutBtn}
+                                    onClick={() => signOut({ callbackUrl: '/login' })}
+                                >
+                                    <span className={styles.menuIcon}>🔌</span>
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </nav>

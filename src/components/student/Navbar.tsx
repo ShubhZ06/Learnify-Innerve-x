@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import styles from './Navbar.module.css';
 
 const navLinks = [
@@ -20,6 +21,7 @@ const notifications = [
 ];
 
 export default function Navbar() {
+    const { data: session } = useSession();
     const pathname = usePathname();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -157,8 +159,8 @@ export default function Navbar() {
                                         className={styles.dropdownAvatar}
                                     />
                                     <div className={styles.profileInfo}>
-                                        <span className={styles.profileName}>Aryan Sharma</span>
-                                        <span className={styles.profileClass}>Class 10 - A</span>
+                                        <span className={styles.profileName}>{session?.user?.name || 'Aryan Sharma'}</span>
+                                        <span className={styles.profileClass}>{session?.user?.email || 'Class 10 - A'}</span>
                                     </div>
                                 </div>
                                 <div className={styles.menuDivider} />
@@ -181,7 +183,10 @@ export default function Navbar() {
                                     </Link>
                                 </div>
                                 <div className={styles.menuDivider} />
-                                <button className={styles.logoutBtn}>
+                                <button
+                                    className={styles.logoutBtn}
+                                    onClick={() => signOut({ callbackUrl: '/login' })}
+                                >
                                     <span className={styles.menuIcon}>🔌</span>
                                     <span>Logout</span>
                                 </button>
