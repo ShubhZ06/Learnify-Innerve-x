@@ -6,21 +6,18 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/student/Navbar';
 import styles from './page.module.css';
 
+// No mock data - will be fetched from MongoDB in the future
 const weeklyPerformance = [
-    { day: 'Mon', score: 60, lessons: 3 },
-    { day: 'Tue', score: 75, lessons: 4 },
-    { day: 'Wed', score: 45, lessons: 2 },
-    { day: 'Thu', score: 90, lessons: 5 },
-    { day: 'Fri', score: 80, lessons: 4 },
-    { day: 'Sat', score: 55, lessons: 3 },
-    { day: 'Sun', score: 70, lessons: 3 },
+    { day: 'Mon', score: 0, lessons: 0 },
+    { day: 'Tue', score: 0, lessons: 0 },
+    { day: 'Wed', score: 0, lessons: 0 },
+    { day: 'Thu', score: 0, lessons: 0 },
+    { day: 'Fri', score: 0, lessons: 0 },
+    { day: 'Sat', score: 0, lessons: 0 },
+    { day: 'Sun', score: 0, lessons: 0 },
 ];
 
-const recommendations = [
-    { id: 'calculus', type: 'Video', title: 'Introduction to Calculus', subject: 'Mathematics', duration: '20 mins', color: '#e0f2fe', route: '/student/video?id=calculus' },
-    { id: 'renaissance', type: 'Article', title: 'History of Renaissance', subject: 'History', duration: '15 mins', color: '#fef3c7', route: '/student/article?id=renaissance' },
-    { id: 'biology', type: 'Quiz', title: 'Biology: Plant Systems', subject: 'Science', duration: '10 Qs', color: '#dcfce7', route: '/student/quiz?id=biology' },
-];
+const recommendations: any[] = [];
 
 export default function StudentDashboard() {
     const router = useRouter();
@@ -31,9 +28,9 @@ export default function StudentDashboard() {
     const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 
     useEffect(() => {
-        const timer1 = setTimeout(() => setAnimatedProgress(65), 300);
-        const timer2 = setTimeout(() => setAnimatedGoal1(75), 400);
-        const timer3 = setTimeout(() => setAnimatedGoal2(30), 500);
+        const timer1 = setTimeout(() => setAnimatedProgress(0), 300);
+        const timer2 = setTimeout(() => setAnimatedGoal1(0), 400);
+        const timer3 = setTimeout(() => setAnimatedGoal2(0), 500);
         const timer4 = setTimeout(() => setWeeklyData(weeklyPerformance.map(d => d.score)), 600);
 
         return () => {
@@ -57,7 +54,7 @@ export default function StudentDashboard() {
                 {/* Left Column: Main Content */}
                 <div className={styles.contentColumn}>
                     <div className={styles.welcomeSection}>
-                        <h1 className={styles.greeting}>Good Morning, Aryan! 👋</h1>
+                        <h1 className={styles.greeting}>Good Morning, Student! 👋</h1>
                         <p className={styles.subGreeting}>Ready to continue your learning journey today?</p>
                     </div>
 
@@ -82,7 +79,7 @@ export default function StudentDashboard() {
                                     </svg>
                                 </div>
                                 <div className={styles.goalContent}>
-                                    <div className={styles.goalTitle}>Complete Chapter 3: Physics Motion</div>
+                                    <div className={styles.goalTitle}>No active goals yet</div>
                                     <div className={styles.goalProgress}>
                                         <div className={styles.progressBar}>
                                             <div className={styles.progressFill} style={{ width: `${animatedGoal1}%` }}></div>
@@ -99,7 +96,7 @@ export default function StudentDashboard() {
                                     </svg>
                                 </div>
                                 <div className={styles.goalContent}>
-                                    <div className={styles.goalTitle}>Chemistry Lab Practice Quiz</div>
+                                    <div className={styles.goalTitle}>No active goals yet</div>
                                     <div className={styles.goalProgress}>
                                         <div className={styles.progressBar}>
                                             <div className={styles.progressFill} style={{ width: `${animatedGoal2}%`, background: '#ef4444' }}></div>
@@ -122,7 +119,7 @@ export default function StudentDashboard() {
                                     <span className={styles.legendDot}></span>
                                     Score %
                                 </span>
-                                <span className={styles.trendBadge}>+12% ↑</span>
+                                <span className={styles.trendBadge}>0% ↑</span>
                             </div>
                         </div>
                         <div className={styles.chartContainer}>
@@ -163,15 +160,15 @@ export default function StudentDashboard() {
                         </div>
                         <div className={styles.chartSummary}>
                             <div className={styles.summaryItem}>
-                                <span className={styles.summaryValue}>24</span>
+                                <span className={styles.summaryValue}>0</span>
                                 <span className={styles.summaryLabel}>Lessons Completed</span>
                             </div>
                             <div className={styles.summaryItem}>
-                                <span className={styles.summaryValue}>68%</span>
+                                <span className={styles.summaryValue}>0%</span>
                                 <span className={styles.summaryLabel}>Avg. Score</span>
                             </div>
                             <div className={styles.summaryItem}>
-                                <span className={styles.summaryValue}>4.2h</span>
+                                <span className={styles.summaryValue}>0h</span>
                                 <span className={styles.summaryLabel}>Study Time/Day</span>
                             </div>
                         </div>
@@ -186,28 +183,39 @@ export default function StudentDashboard() {
                             <Link href="/student/library" className={styles.seeAllLink}>See All →</Link>
                         </div>
                         <div className={styles.recommendationsGrid}>
-                            {recommendations.map((rec) => (
-                                <div
-                                    key={rec.id}
-                                    className={styles.recommendationCard}
-                                    onClick={() => handleRecommendationClick(rec.route)}
-                                >
-                                    <div className={styles.cardImage} style={{ background: `linear-gradient(135deg, ${rec.color} 0%, ${rec.color}dd 100%)` }}>
-                                        <span className={styles.cardTag}>{rec.type}</span>
-                                        <div className={styles.playOverlay}>
-                                            <span>▶</span>
+                            {recommendations.length === 0 ? (
+                                <p style={{
+                                    textAlign: 'center',
+                                    color: '#6b7280',
+                                    padding: '2rem',
+                                    gridColumn: '1 / -1'
+                                }}>
+                                    No recommendations available yet. Start learning to get personalized content!
+                                </p>
+                            ) : (
+                                recommendations.map((rec) => (
+                                    <div
+                                        key={rec.id}
+                                        className={styles.recommendationCard}
+                                        onClick={() => handleRecommendationClick(rec.route)}
+                                    >
+                                        <div className={styles.cardImage} style={{ background: `linear-gradient(135deg, ${rec.color} 0%, ${rec.color}dd 100%)` }}>
+                                            <span className={styles.cardTag}>{rec.type}</span>
+                                            <div className={styles.playOverlay}>
+                                                <span>▶</span>
+                                            </div>
+                                        </div>
+                                        <div className={styles.cardBody}>
+                                            <h3 className={styles.cardTitle}>{rec.title}</h3>
+                                            <div className={styles.cardMeta}>
+                                                <span>{rec.subject}</span>
+                                                <span>•</span>
+                                                <span>{rec.duration}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className={styles.cardBody}>
-                                        <h3 className={styles.cardTitle}>{rec.title}</h3>
-                                        <div className={styles.cardMeta}>
-                                            <span>{rec.subject}</span>
-                                            <span>•</span>
-                                            <span>{rec.duration}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
@@ -220,7 +228,7 @@ export default function StudentDashboard() {
                             <span className={styles.fireEmoji}>🔥</span>
                             <span style={{ fontWeight: 600, color: '#92400e' }}>Learning Streak</span>
                         </div>
-                        <div className={styles.streakCount}>12 Days</div>
+                        <div className={styles.streakCount}>0 Days</div>
                         <div className={styles.streakLabel}>You&apos;re on fire! Keep it up</div>
                     </div>
 
@@ -245,7 +253,7 @@ export default function StudentDashboard() {
                             </div>
                         </div>
                         <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
-                            2.5 hrs / 4 hrs goal reached
+                            0 hrs / 4 hrs goal reached
                         </p>
                     </div>
 
@@ -254,10 +262,10 @@ export default function StudentDashboard() {
                         <h3 className={styles.sectionTitle} style={{ fontSize: '1rem', marginBottom: '1rem' }}>Subject Performance</h3>
                         <div className={styles.subjectsList}>
                             {[
-                                { name: 'Mathematics', score: 85, color: '#3b82f6' },
-                                { name: 'Science', score: 78, color: '#22c55e' },
-                                { name: 'English', score: 92, color: '#f59e0b' },
-                                { name: 'History', score: 68, color: '#8b5cf6' },
+                                { name: 'Mathematics', score: 0, color: '#3b82f6' },
+                                { name: 'Science', score: 0, color: '#22c55e' },
+                                { name: 'English', score: 0, color: '#f59e0b' },
+                                { name: 'History', score: 0, color: '#8b5cf6' },
                             ].map((subject, idx) => (
                                 <div key={subject.name} className={styles.subjectItem}>
                                     <div className={styles.subjectInfo}>
@@ -277,6 +285,14 @@ export default function StudentDashboard() {
                                 </div>
                             ))}
                         </div>
+                        <p style={{
+                            textAlign: 'center',
+                            color: '#6b7280',
+                            fontSize: '0.875rem',
+                            marginTop: '1rem'
+                        }}>
+                            Complete lessons to see your subject performance
+                        </p>
                     </div>
 
                     {/* Upcoming Assignments */}
@@ -286,30 +302,14 @@ export default function StudentDashboard() {
                             <Link href="/student/practice" style={{ color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 500 }}>See All</Link>
                         </div>
                         <div className={styles.assignmentsList}>
-                            <div className={styles.assignmentItem}>
-                                <div className={styles.assignmentHeader}>
-                                    <span className={styles.subjectTag}>Math</span>
-                                    <span className={styles.dueDate}>Tomorrow</span>
-                                </div>
-                                <div className={styles.assignmentTitle}>Algebra Worksheet 4.2</div>
-                                <div className={styles.assignmentTime}>Est. 45 mins</div>
-                            </div>
-                            <div className={styles.assignmentItem}>
-                                <div className={styles.assignmentHeader}>
-                                    <span className={styles.subjectTag}>Science</span>
-                                    <span className={styles.dueDate}>Fri, Feb 2</span>
-                                </div>
-                                <div className={styles.assignmentTitle}>Lab Report: Chemical Reactions</div>
-                                <div className={styles.assignmentTime}>Est. 1.5 hrs</div>
-                            </div>
-                            <div className={styles.assignmentItem}>
-                                <div className={styles.assignmentHeader}>
-                                    <span className={styles.subjectTag}>English</span>
-                                    <span className={styles.dueDate}>Mon, Feb 5</span>
-                                </div>
-                                <div className={styles.assignmentTitle}>Essay: Macbeth Analysis</div>
-                                <div className={styles.assignmentTime}>Est. 2 hrs</div>
-                            </div>
+                            <p style={{
+                                textAlign: 'center',
+                                color: '#6b7280',
+                                fontSize: '0.875rem',
+                                padding: '1rem'
+                            }}>
+                                No assignments yet. Join a classroom to get started!
+                            </p>
                         </div>
                     </div>
                 </aside>

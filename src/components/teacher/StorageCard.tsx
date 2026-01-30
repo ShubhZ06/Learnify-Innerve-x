@@ -1,9 +1,10 @@
 import styles from './StorageCard.module.css';
 
 export default function StorageCard() {
-    const usedGB = 2.3;
-    const totalGB = 4.0;
-    const percentage = (usedGB / totalGB) * 100;
+    // No mock data - will be fetched from MongoDB in the future
+    const usedGB = 0;
+    const totalGB = 5.0; // Default plan allocation
+    const percentage = totalGB > 0 ? (usedGB / totalGB) * 100 : 0;
 
     return (
         <div className={styles.card}>

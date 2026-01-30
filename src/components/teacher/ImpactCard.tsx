@@ -1,6 +1,10 @@
 import styles from './ImpactCard.module.css';
 
 export default function ImpactCard() {
+    // No mock data - will be fetched from MongoDB in the future
+    const worksheetsCreated = 0;
+    const timeSaved = 0;
+
     return (
         <div className={styles.card}>
             <h3 className={styles.title}>This Month's Impact</h3>
@@ -14,7 +18,7 @@ export default function ImpactCard() {
                         </svg>
                     </div>
                     <div className={styles.statContent}>
-                        <span className={styles.statValue}>12</span>
+                        <span className={styles.statValue}>{worksheetsCreated}</span>
                         <span className={styles.statLabel}>Worksheets Created</span>
                     </div>
                 </div>
@@ -27,7 +31,7 @@ export default function ImpactCard() {
                         </svg>
                     </div>
                     <div className={styles.statContent}>
-                        <span className={styles.statValue}>8 hrs</span>
+                        <span className={styles.statValue}>{timeSaved} hrs</span>
                         <span className={styles.statLabel}>Planning Time Saved</span>
                     </div>
                 </div>
