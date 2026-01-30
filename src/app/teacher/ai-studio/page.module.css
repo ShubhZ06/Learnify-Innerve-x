@@ -649,3 +649,147 @@
     max-width: 400px;
     line-height: 1.5;
 }
+
+/* Publish Section */
+.publishSection {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.publishSection h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.publishField {
+    margin-bottom: 16px;
+}
+
+.publishField label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.publishInput,
+.publishSelect {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    background: white;
+    transition: all 0.2s;
+}
+
+.publishInput:focus,
+.publishSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.classroomList {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.classroomCheckbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.classroomCheckbox:last-child {
+    border-bottom: none;
+}
+
+.classroomCheckbox:hover {
+    background: #eff6ff;
+}
+
+.classroomCheckbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+}
+
+.classroomCheckbox span:first-of-type {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #1e293b;
+}
+
+.classroomCode {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-family: monospace;
+}
+
+.noClassrooms {
+    padding: 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.8125rem;
+}
+
+.saveToLibraryCheck {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.saveToLibraryCheck input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #10b981;
+}
+
+.publishMessage {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    margin-bottom: 12px;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.publishBtn {
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.publishBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.publishBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

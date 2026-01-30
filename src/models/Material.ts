@@ -8,7 +8,8 @@ export interface IMaterial extends Document {
     type: MaterialType;
     title: string;
     description: string;
-    content?: string; // For articles/announcements
+    content?: string | object; // Can be string or JSON object
+    jsonData?: object; // For storing structured JSON data
     fileUrl?: string; // For uploaded files
     videoUrl?: string; // For videos
     dueDate?: Date; // For assignments/quizzes
@@ -29,7 +30,8 @@ const MaterialSchema: Schema<IMaterial> = new Schema(
         },
         title: { type: String, required: true },
         description: { type: String, required: true },
-        content: { type: String },
+        content: { type: Schema.Types.Mixed }, // Changed to Mixed for JSON support
+        jsonData: { type: Schema.Types.Mixed }, // Additional JSON storage field
         fileUrl: { type: String },
         videoUrl: { type: String },
         dueDate: { type: Date },

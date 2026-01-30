@@ -35,6 +35,15 @@ export default function AIStudioPage() {
     const [showAddMenu, setShowAddMenu] = useState(false);
     const [showTemplates, setShowTemplates] = useState(false);
 
+    // Publishing state
+    const [teacherClassrooms, setTeacherClassrooms] = useState<{ _id: string, name: string, code: string }[]>([]);
+    const [selectedClassrooms, setSelectedClassrooms] = useState<string[]>([]);
+    const [materialType, setMaterialType] = useState<string>('article');
+    const [materialTitle, setMaterialTitle] = useState('');
+    const [saveToLibrary, setSaveToLibrary] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [publishMessage, setPublishMessage] = useState('');
+
     const nodeTypes = useMemo(() => ({ editable: EditableNode }), []);
 
     const {
@@ -130,6 +139,22 @@ export default function AIStudioPage() {
             setEdges(flowEdges);
         }
     }, [currentDAG, dagToFlow, setNodes, setEdges]);
+
+    // Fetch teacher's classrooms for publishing
+    useEffect(() => {
+        const fetchClassrooms = async () => {
+            try {
+                const response = await fetch('/api/teacher/my-classrooms');
+                if (response.ok) {
+                    const data = await response.json();
+                    setTeacherClassrooms(data.classrooms || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch classrooms:', error);
+            }
+        };
+        fetchClassrooms();
+    }, []);
 
     // Load template
     const loadTemplate = (template: typeof templates[0]) => {
@@ -403,6 +428,120 @@ export default function AIStudioPage() {
                             <div className={styles.outputResult}>
                                 <h4>Output</h4>
                                 <OutputRenderer content={getFinalOutput() || ''} />
+
+                                {/* Publish Section */}
+                                <div className={styles.publishSection}>
+                                    <h4>📤 Publish to Classroom</h4>
+
+                                    <div className={styles.publishField}>
+                                        <label>Title</label>
+                                        <input
+                                            type="text"
+                                            value={materialTitle || appName}
+                                            onChange={(e) => setMaterialTitle(e.target.value)}
+                                            placeholder="Material title"
+                                            className={styles.publishInput}
+                                        />
+                                    </div>
+
+                                    <div className={styles.publishField}>
+                                        <label>Type</label>
+                                        <select
+                                            value={materialType}
+                                            onChange={(e) => setMaterialType(e.target.value)}
+                                            className={styles.publishSelect}
+                                        >
+                                            <option value="article">📄 Article</option>
+                                            <option value="announcement">📢 Announcement</option>
+                                            <option value="assignment">📝 Assignment</option>
+                                            <option value="quiz">📊 Quiz</option>
+                                            <option value="resource">📁 Resource</option>
+                                            <option value="video">🎥 Video</option>
+                                        </select>
+                                    </div>
+
+                                    <div className={styles.publishField}>
+                                        <label>Select Classrooms</label>
+                                        <div className={styles.classroomList}>
+                                            {teacherClassrooms.length === 0 ? (
+                                                <p className={styles.noClassrooms}>No classrooms found. Create one first!</p>
+                                            ) : (
+                                                teacherClassrooms.map(c => (
+                                                    <label key={c._id} className={styles.classroomCheckbox}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedClassrooms.includes(c._id)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setSelectedClassrooms([...selectedClassrooms, c._id]);
+                                                                } else {
+                                                                    setSelectedClassrooms(selectedClassrooms.filter(id => id !== c._id));
+                                                                }
+                                                            }}
+                                                        />
+                                                        <span>{c.name}</span>
+                                                        <span className={styles.classroomCode}>{c.code}</span>
+                                                    </label>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <label className={styles.saveToLibraryCheck}>
+                                        <input
+                                            type="checkbox"
+                                            checked={saveToLibrary}
+                                            onChange={(e) => setSaveToLibrary(e.target.checked)}
+                                        />
+                                        <span>Also save to Library</span>
+                                    </label>
+
+                                    {publishMessage && (
+                                        <div className={styles.publishMessage}>
+                                            {publishMessage}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        className={styles.publishBtn}
+                                        onClick={async () => {
+                                            if (selectedClassrooms.length === 0) {
+                                                setPublishMessage('Please select at least one classroom');
+                                                return;
+                                            }
+                                            setIsPublishing(true);
+                                            setPublishMessage('');
+                                            try {
+                                                const response = await fetch('/api/teacher/publish-material', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        classroomIds: selectedClassrooms,
+                                                        type: materialType,
+                                                        title: materialTitle || appName,
+                                                        description: 'Generated via AI Studio',
+                                                        content: getFinalOutput(),
+                                                        saveToLibrary
+                                                    })
+                                                });
+                                                const data = await response.json();
+                                                if (response.ok) {
+                                                    setPublishMessage(`✅ ${data.message}`);
+                                                    setSelectedClassrooms([]);
+                                                } else {
+                                                    setPublishMessage(`❌ ${data.error}`);
+                                                }
+                                            } catch (error) {
+                                                setPublishMessage('❌ Failed to publish');
+                                            } finally {
+                                                setIsPublishing(false);
+                                            }
+                                        }}
+                                        disabled={isPublishing || selectedClassrooms.length === 0}
+                                    >
+                                        {isPublishing ? 'Publishing...' : `Publish to ${selectedClassrooms.length} Classroom(s)`}
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <div className={styles.emptyPreview}>

@@ -579,3 +579,223 @@
     color: #6b7280;
     margin: 0;
 }
+
+/* Content Viewer Modal */
+.contentViewerOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    animation: fadeIn 0.2s ease;
+}
+
+.contentViewer {
+    background: white;
+    border-radius: 1rem;
+    width: 95%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    animation: slideUp 0.3s ease;
+    position: relative;
+    padding: 2rem;
+}
+
+.contentHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.contentIcon {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+}
+
+.contentTitle {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.contentMeta {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0 0;
+}
+
+.contentDescription {
+    font-size: 0.9375rem;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.contentDetails {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.contentBody {
+    margin-top: 1rem;
+}
+
+.contentText {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: #374151;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.jsonContent {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.noContent {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 2rem;
+}
+
+.videoEmbed,
+.fileDownload {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+}
+
+.videoEmbed a,
+.fileDownload a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.videoEmbed a:hover,
+.fileDownload a:hover {
+    text-decoration: underline;
+}
+
+/* Quiz Content Styles */
+.quizContent {
+    padding: 0.5rem 0;
+}
+
+.quizTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.questionCard {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.questionHeader {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.questionNumber {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.questionText {
+    font-size: 0.9375rem;
+    color: #1e293b;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.optionsList {
+    margin-left: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.optionItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.optionLetter {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.correctAnswer {
+    margin-top: 0.75rem;
+    margin-left: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 1px solid #34d399;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #047857;
+}

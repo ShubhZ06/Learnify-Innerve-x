@@ -26,11 +26,17 @@ interface Material {
     type: 'quiz' | 'assignment' | 'video' | 'article' | 'resource' | 'announcement';
     title: string;
     description: string;
+    content?: string;
+    jsonData?: any; // Structured JSON content
     dueDate?: string;
     points?: number;
     videoUrl?: string;
     fileUrl?: string;
-    content?: string;
+    teacher?: {
+        name: string;
+        email: string;
+    };
+    createdAt?: string;
 }
 
 interface MaterialsData {
@@ -59,6 +65,7 @@ export default function EnrolledClassrooms() {
     });
     const [activeTab, setActiveTab] = useState<TabType>('all');
     const [isLoadingMaterials, setIsLoadingMaterials] = useState(false);
+    const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
     useEffect(() => {
         fetchEnrollments();
@@ -280,7 +287,10 @@ export default function EnrolledClassrooms() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <button className={styles.materialAction}>
+                                            <button
+                                                className={styles.materialAction}
+                                                onClick={() => setSelectedMaterial(material)}
+                                            >
                                                 View →
                                             </button>
                                         </div>
@@ -297,6 +307,140 @@ export default function EnrolledClassrooms() {
                                             ? 'Your teacher hasn\'t added any materials to this classroom yet.'
                                             : `No ${activeTab} have been added yet. Check back later!`}
                                     </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Material Content Viewer Modal */}
+            {selectedMaterial && (
+                <div className={styles.contentViewerOverlay} onClick={() => setSelectedMaterial(null)}>
+                    <div className={styles.contentViewer} onClick={(e) => e.stopPropagation()}>
+                        <button
+                            className={styles.closeBtn}
+                            onClick={() => setSelectedMaterial(null)}
+                        >
+                            ×
+                        </button>
+
+                        <div className={styles.contentHeader}>
+                            <div className={styles.contentIcon}>
+                                {getMaterialIcon(selectedMaterial.type)}
+                            </div>
+                            <div>
+                                <h2 className={styles.contentTitle}>{selectedMaterial.title}</h2>
+                                <p className={styles.contentMeta}>
+                                    {selectedMaterial.type.charAt(0).toUpperCase() + selectedMaterial.type.slice(1)}
+                                    {selectedMaterial.teacher && ` • By ${selectedMaterial.teacher.name}`}
+                                    {selectedMaterial.createdAt && ` • ${new Date(selectedMaterial.createdAt).toLocaleDateString()}`}
+                                </p>
+                            </div>
+                        </div>
+
+                        {selectedMaterial.description && (
+                            <p className={styles.contentDescription}>{selectedMaterial.description}</p>
+                        )}
+
+                        {(selectedMaterial.dueDate || selectedMaterial.points) && (
+                            <div className={styles.contentDetails}>
+                                {selectedMaterial.dueDate && (
+                                    <span>📅 Due: {new Date(selectedMaterial.dueDate).toLocaleDateString()}</span>
+                                )}
+                                {selectedMaterial.points && (
+                                    <span>⭐ {selectedMaterial.points} points</span>
+                                )}
+                            </div>
+                        )}
+
+                        <div className={styles.contentBody}>
+                            {(() => {
+                                // Try to parse content as JSON if it's a string
+                                let parsedContent = selectedMaterial.jsonData;
+                                if (!parsedContent && selectedMaterial.content) {
+                                    try {
+                                        parsedContent = typeof selectedMaterial.content === 'string'
+                                            ? JSON.parse(selectedMaterial.content)
+                                            : selectedMaterial.content;
+                                    } catch (e) {
+                                        // Not JSON, display as text
+                                    }
+                                }
+
+                                // Render quiz questions nicely
+                                if (parsedContent?.questions && Array.isArray(parsedContent.questions)) {
+                                    return (
+                                        <div className={styles.quizContent}>
+                                            <h4 className={styles.quizTitle}>
+                                                📝 {parsedContent.questions.length} Questions
+                                            </h4>
+                                            {parsedContent.questions.map((q: any, idx: number) => (
+                                                <div key={idx} className={styles.questionCard}>
+                                                    <div className={styles.questionHeader}>
+                                                        <span className={styles.questionNumber}>Q{idx + 1}</span>
+                                                        <span className={styles.questionText}>{q.question}</span>
+                                                    </div>
+                                                    {q.options && (
+                                                        <div className={styles.optionsList}>
+                                                            {q.options.map((opt: string, oidx: number) => (
+                                                                <div key={oidx} className={styles.optionItem}>
+                                                                    <span className={styles.optionLetter}>
+                                                                        {String.fromCharCode(65 + oidx)}
+                                                                    </span>
+                                                                    <span>{opt}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {q.correctAnswer && (
+                                                        <div className={styles.correctAnswer}>
+                                                            ✓ Answer: {q.correctAnswer}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                }
+
+                                // Render other structured JSON
+                                if (parsedContent && typeof parsedContent === 'object') {
+                                    return (
+                                        <pre className={styles.jsonContent}>
+                                            {JSON.stringify(parsedContent, null, 2)}
+                                        </pre>
+                                    );
+                                }
+
+                                // Render text content
+                                if (selectedMaterial.content && typeof selectedMaterial.content === 'string') {
+                                    return (
+                                        <div
+                                            className={styles.contentText}
+                                            dangerouslySetInnerHTML={{
+                                                __html: selectedMaterial.content.replace(/\n/g, '<br>')
+                                            }}
+                                        />
+                                    );
+                                }
+
+                                return <p className={styles.noContent}>No content available for this material.</p>;
+                            })()}
+
+                            {selectedMaterial.videoUrl && (
+                                <div className={styles.videoEmbed}>
+                                    <a href={selectedMaterial.videoUrl} target="_blank" rel="noopener noreferrer">
+                                        🎥 Watch Video
+                                    </a>
+                                </div>
+                            )}
+
+                            {selectedMaterial.fileUrl && (
+                                <div className={styles.fileDownload}>
+                                    <a href={selectedMaterial.fileUrl} target="_blank" rel="noopener noreferrer">
+                                        📁 Download File
+                                    </a>
                                 </div>
                             )}
                         </div>
