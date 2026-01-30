@@ -1,5 +1,4 @@
 import WelcomeCard from '@/components/teacher/WelcomeCard';
-import CreateContentCard from '@/components/teacher/CreateContentCard';
 import StorageCard from '@/components/teacher/StorageCard';
 import ImpactCard from '@/components/teacher/ImpactCard';
 import HelpCard from '@/components/teacher/HelpCard';
@@ -12,7 +11,6 @@ export default function TeacherDashboard() {
             {/* Main Content Area */}
             <div className={styles.mainContent}>
                 <WelcomeCard />
-                <CreateContentCard />
                 <RecentCreations />
             </div>
 
