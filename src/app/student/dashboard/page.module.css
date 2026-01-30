@@ -1,0 +1,595 @@
+.dashboard {
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.mainContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+}
+
+.welcomeSection {
+    margin-bottom: 2rem;
+}
+
+.greeting {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.subGreeting {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+/* Learning Goals Section */
+.goalsSection {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-border);
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.goalsList {
+    display: grid;
+    gap: 1rem;
+}
+
+.goalCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.goalCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.goalIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--color-primary);
+}
+
+.goalContent {
+    flex: 1;
+}
+
+.goalTitle {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+}
+
+.goalProgress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.progressBar {
+    flex: 1;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--color-success);
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+.progressText {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+/* Recommended Section */
+.recommendationsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.recommendationCard {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.recommendationCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary-light);
+}
+
+.cardImage {
+    height: 140px;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    position: relative;
+}
+
+.cardTag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.cardBody {
+    padding: 1.25rem;
+}
+
+.cardTitle {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+}
+
+/* Sidebar Widgets */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.widget {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+}
+
+.streakWidget {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #fde68a;
+}
+
+.streakCount {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #d97706;
+    line-height: 1;
+    margin: 1rem 0;
+}
+
+.streakLabel {
+    color: #92400e;
+    font-weight: 500;
+}
+
+/* Assignments Widget */
+.assignmentItem {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.assignmentItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.assignmentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.subjectTag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.dueDate {
+    font-size: 0.75rem;
+    color: var(--color-danger);
+    font-weight: 500;
+}
+
+.assignmentTitle {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.assignmentTime {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+}
+
+/* Today's Target Widget - Animated Circle */
+.targetCircle {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 1rem;
+    position: relative;
+}
+
+.circleChart {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circleBg {
+    fill: none;
+    stroke: #e2e8f0;
+    stroke-width: 3.5;
+}
+
+.circleFill {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease;
+}
+
+.circleContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.targetPercent {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.targetLabel {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Fire Emoji Animation */
+.fireEmoji {
+    font-size: 1.25rem;
+    animation: pulse 1s ease infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Chart Section */
+.chartSection {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-border);
+}
+
+.chartLegend {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.legendDot {
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+    border-radius: 50%;
+}
+
+.trendBadge {
+    padding: 0.25rem 0.75rem;
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-success);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.chartContainer {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.chartYAxis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 0.5rem 1.5rem 0;
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    text-align: right;
+    min-width: 32px;
+}
+
+/* Bar Chart */
+.barChart {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 160px;
+    gap: 0.75rem;
+    border-left: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 0.5rem;
+}
+
+.barWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    cursor: pointer;
+}
+
+.barTooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-text-primary);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    animation: fadeIn 0.2s ease;
+}
+
+.barTooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--color-text-primary);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.bar {
+    width: 100%;
+    height: 140px;
+    background: #f1f5f9;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    transition: all 0.2s ease;
+}
+
+.barWrapper:hover .bar {
+    background: #e2e8f0;
+}
+
+.barFill {
+    width: 100%;
+    background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+    border-radius: var(--radius-lg);
+    transition: height 0.8s ease, transform 0.2s ease;
+}
+
+.barHovered {
+    transform: scaleX(1.1);
+}
+
+.barLabel {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+/* Chart Summary */
+.chartSummary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.summaryItem {
+    text-align: center;
+}
+
+.summaryValue {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.summaryLabel {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* Recommendations Link */
+.seeAllLink {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.seeAllLink:hover {
+    text-decoration: underline;
+}
+
+/* Play Overlay on Cards */
+.playOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 1.25rem;
+    color: var(--color-primary);
+}
+
+.recommendationCard:hover .playOverlay {
+    opacity: 1;
+}
+
+/* Subject Performance */
+.subjectsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.subjectItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.subjectInfo {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.subjectInfo span:first-child {
+    color: var(--color-text-primary);
+}
+
+.subjectScore {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.subjectBar {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.subjectBarFill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 1s ease;
+}
+
+@media (max-width: 1024px) {
+    .mainContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .barChart {
+        height: 100px;
+    }
+
+    .bar {
+        height: 80px;
+    }
+}
