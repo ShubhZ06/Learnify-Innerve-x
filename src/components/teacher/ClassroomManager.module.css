@@ -1,0 +1,156 @@
+.container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.addBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.addBtn:hover {
+    background: #2563eb;
+}
+
+.createForm {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f3f4f6;
+    border-radius: 8px;
+}
+
+.input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submitBtn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.classList {
+    display: grid;
+    gap: 1rem;
+}
+
+.emptyState {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+    padding: 1rem;
+}
+
+.classCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+.classCard:hover {
+    border-color: #3b82f6;
+}
+
+.classInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.className {
+    font-weight: 600;
+    color: #111827;
+}
+
+.classCodeLabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.codeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #eff6ff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px dashed #3b82f6;
+}
+
+.classCode {
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e40af;
+    letter-spacing: 0.05em;
+}
+
+.copyBtn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.copyBtn:hover {
+    background: rgba(59, 130, 246, 0.1);
+}

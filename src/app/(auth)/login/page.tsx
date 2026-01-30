@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
 
 export default function LoginPage() {
@@ -9,15 +11,40 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate loading - no database connection yet
-        setTimeout(() => {
+
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                alert("Invalid email or password");
+                setIsLoading(false);
+            } else {
+                // Fetch the session to get the user's role
+                const sessionResponse = await fetch("/api/auth/session");
+                const session = await sessionResponse.json();
+
+                if (session?.user?.role === "TEACHER") {
+                    router.push("/teacher/dashboard");
+                } else if (session?.user?.role === "STUDENT") {
+                    router.push("/student/dashboard");
+                } else {
+                    router.push("/dashboard");
+                }
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            alert("An error occurred. Please try again.");
             setIsLoading(false);
-            alert("Login functionality will be connected to database later!");
-        }, 1000);
+        }
     };
 
     return (
