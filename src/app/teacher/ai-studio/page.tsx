@@ -370,18 +370,23 @@ export default function AIStudioPage() {
                                 Add Assets
                             </button>
                         </div>
-                        <ReactFlow
-                            nodes={nodes}
-                            edges={edges}
-                            onNodesChange={onNodesChange}
-                            onEdgesChange={onEdgesChange}
-                            onConnect={onConnect}
-                            fitView
-                            style={{ background: '#f8fafc' }}
-                        >
-                            <Controls style={{ background: '#ffffff', borderRadius: '8px' }} />
-                            <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e1" />
-                        </ReactFlow>
+                        {/* Canvas Wrapper with bounded size */}
+                        <div className={styles.canvasWrapper}>
+                            <div className={styles.canvasContainer}>
+                                <ReactFlow
+                                    nodes={nodes}
+                                    edges={edges}
+                                    onNodesChange={onNodesChange}
+                                    onEdgesChange={onEdgesChange}
+                                    onConnect={onConnect}
+                                    fitView
+                                    style={{ background: '#f8fafc' }}
+                                >
+                                    <Controls style={{ background: '#ffffff', borderRadius: '8px' }} />
+                                    <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e1" />
+                                </ReactFlow>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
