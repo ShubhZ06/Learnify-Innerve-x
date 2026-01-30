@@ -148,7 +148,7 @@ export async function GET(request: Request) {
                 const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer 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`,
+                        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
                         "Content-Type": "application/json",
                         "HTTP-Referer": "http://localhost:3000",
                         "X-Title": "Learnify"

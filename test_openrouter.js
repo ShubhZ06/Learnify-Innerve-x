@@ -1,6 +1,7 @@
 const axios = require('axios');
+require('dotenv').config({ path: '.env.local' });
 
-const API_KEY = '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';
+const API_KEY = process.env.OPENROUTER_API_KEY;
 
 async function generateData(topic) {
     console.log(`Generating AI data for: ${topic}`);
