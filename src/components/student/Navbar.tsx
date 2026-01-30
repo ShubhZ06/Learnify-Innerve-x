@@ -7,7 +7,7 @@ import styles from './Navbar.module.css';
 
 const navLinks = [
     { href: '/student/dashboard', label: 'Home' },
-    { href: '/student/ai-tutor', label: 'AI Tutor' },
+    { href: '/student/ai-tutor', label: 'Offline AI Tutor' },
     { href: '/student/library', label: 'Library' },
     { href: '/student/practice', label: 'Practice' },
 ];

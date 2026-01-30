@@ -1,79 +1,84 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Navbar from '@/components/student/Navbar';
+import { useLanguage } from '@/context/LanguageContext';
 import styles from './page.module.css';
-
-const formatModes = [
-    { id: 'notes', label: 'Notes', icon: '📝', description: 'Text summaries' },
-    { id: 'slides', label: 'Slides', icon: '📊', description: 'Presentations' },
-    { id: 'visual', label: 'Visual', icon: '🖼️', description: 'Diagrams' },
-    { id: 'voice', label: 'Voice', icon: '🔊', description: 'Audio' },
-];
-
-const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'History', 'English', 'Computer Science'];
-const grades = [6, 7, 8, 9, 10, 11, 12];
 
 interface Message {
     id: number;
     type: 'user' | 'ai';
     content: string;
-    format?: string;
 }
 
 export default function AITutorPage() {
-    const [activeFormat, setActiveFormat] = useState('notes');
+    const { t } = useLanguage();
     const [inputText, setInputText] = useState('');
-    const [isRecording, setIsRecording] = useState(false);
-    const [showSettings, setShowSettings] = useState(false);
-    const [selectedSubject, setSelectedSubject] = useState('Mathematics');
-    const [selectedGrade, setSelectedGrade] = useState(10);
-    const [difficulty, setDifficulty] = useState(2); // 1=Easy, 2=Medium, 3=Hard
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 1,
-            type: 'ai',
-            content: "Hello! 👋 I'm your AI Tutor. Ask me anything about your studies! I can explain topics, create notes, generate diagrams, or even explain through voice. What would you like to learn today?",
-        },
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isTyping, setIsTyping] = useState(false);
+    const [userName] = useState('Student');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleSend = () => {
-        if (!inputText.trim()) return;
+    const quickActions = [
+        { label: t('explainTopic'), icon: '📚' },
+        { label: t('solveProblem'), icon: '🧮' },
+        { label: t('createNotes'), icon: '📝' },
+        { label: t('helpStudy'), icon: '🎯' },
+    ];
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const handleSend = (text?: string) => {
+        const messageText = text || inputText;
+        if (!messageText.trim()) return;
 
         const newMessage: Message = {
             id: Date.now(),
             type: 'user',
-            content: inputText,
+            content: messageText,
         };
 
         setMessages(prev => [...prev, newMessage]);
         setInputText('');
+        setIsTyping(true);
 
         // Simulate AI response
         setTimeout(() => {
             const aiResponse: Message = {
                 id: Date.now() + 1,
                 type: 'ai',
-                content: `Great question! Based on your ${selectedSubject} query at Grade ${selectedGrade} level (${['Easy', 'Medium', 'Hard'][difficulty - 1]} difficulty), here's my explanation in ${activeFormat} format:\n\n${getFormatResponse(activeFormat, inputText)}`,
-                format: activeFormat,
+                content: generateResponse(messageText),
             };
             setMessages(prev => [...prev, aiResponse]);
-        }, 1000);
+            setIsTyping(false);
+        }, 1500);
     };
 
-    const getFormatResponse = (format: string, query: string) => {
-        switch (format) {
-            case 'notes':
-                return `📝 **Key Points:**\n• ${query} is a fundamental concept\n• It involves understanding core principles\n• Practice is essential for mastery\n\n**Summary:** This topic builds upon your foundational knowledge and connects to real-world applications.`;
-            case 'slides':
-                return `📊 **Slide 1:** Introduction to ${query}\n📊 **Slide 2:** Core Concepts\n📊 **Slide 3:** Examples & Applications\n📊 **Slide 4:** Practice Problems\n📊 **Slide 5:** Key Takeaways`;
-            case 'visual':
-                return `🖼️ **Visual Diagram Generated:**\n[Concept Map showing ${query} relationships]\n\n• Central node: Main Topic\n• Connected nodes: Sub-concepts\n• Arrows showing relationships`;
-            case 'voice':
-                return `🔊 **Audio Explanation Ready:**\n\n"Let me explain ${query} step by step..."\n\n▶️ [Play Audio - 3:45]\n\nTranscript available below.`;
-            default:
-                return `Here's information about ${query}...`;
-        }
+    const generateResponse = (query: string) => {
+        return `Here's my response to "${query}":
+
+**Understanding the Concept:**
+This is an important topic that covers fundamental principles. Let me break it down step by step.
+
+**Key Points:**
+• First, we need to understand the basic definition
+• Next, we explore how this applies in practice
+• Finally, we can solve related problems
+
+**Example:**
+Let's consider a simple example to illustrate this concept...
+
+**Practice Tip:**
+Try solving 2-3 similar problems to reinforce your understanding.
+
+*This is an offline AI response. For more detailed explanations, please connect to the internet.*`;
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -83,192 +88,177 @@ export default function AITutorPage() {
         }
     };
 
+    const handleQuickAction = (action: string) => {
+        setInputText(action);
+        inputRef.current?.focus();
+    };
+
+    const handleNewChat = () => {
+        setMessages([]);
+        setInputText('');
+    };
+
     return (
-        <div className={styles.aiTutor}>
+        <div className={styles.pageWrapper}>
             <Navbar />
 
             <div className={styles.mainContainer}>
-                {/* Header */}
-                <div className={styles.header}>
-                    <div className={styles.headerContent}>
-                        <h1 className={styles.title}>
-                            <span className={styles.aiIcon}>🤖</span>
-                            AI Tutor
-                        </h1>
-                        <p className={styles.subtitle}>Your personal learning assistant</p>
+                {/* Main Chat Area */}
+                <main className={styles.chatArea}>
+                    <div className={styles.chatHeader}>
+                        <div className={styles.headerLeft}>
+                            <div className={styles.headerTitle}>
+                                <span className={styles.aiLogo}>🤖</span>
+                                <div>
+                                    <h1>{t('aiTutor')}</h1>
+                                    <span className={styles.statusBadge}>
+                                        <span className={styles.statusDot}></span>
+                                        {t('readyToHelp')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.headerRight}>
+                            <div className={styles.offlineTag}>
+                                <span className={styles.offlineDot}></span>
+                                {t('offlineMode')}
+                            </div>
+                            {messages.length > 0 && (
+                                <button className={styles.clearBtn} onClick={handleNewChat}>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <polyline points="3 6 5 6 21 6" />
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                    </svg>
+                                    {t('clear')}
+                                </button>
+                            )}
+                        </div>
                     </div>
-                    <button
-                        className={`${styles.settingsBtn} ${showSettings ? styles.active : ''}`}
-                        onClick={() => setShowSettings(!showSettings)}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                        </svg>
-                        Settings
-                    </button>
-                </div>
 
-                {/* Format Mode Selector */}
-                <div className={styles.formatSelector}>
-                    {formatModes.map((mode) => (
-                        <button
-                            key={mode.id}
-                            className={`${styles.formatBtn} ${activeFormat === mode.id ? styles.active : ''}`}
-                            onClick={() => setActiveFormat(mode.id)}
-                        >
-                            <span className={styles.formatIcon}>{mode.icon}</span>
-                            <span className={styles.formatLabel}>{mode.label}</span>
-                        </button>
-                    ))}
-                </div>
+                    {messages.length === 0 ? (
+                        <div className={styles.welcomeScreen}>
+                            <div className={styles.welcomeCard}>
+                                <div className={styles.welcomeIcon}>✨</div>
+                                <h1 className={styles.welcomeTitle}>
+                                    {t('hello')}, {userName}!
+                                </h1>
+                                <p className={styles.welcomeSubtitle}>
+                                    {t('whatToLearn')}
+                                </p>
 
-                <div className={styles.contentArea}>
-                    {/* Chat Section */}
-                    <div className={styles.chatSection}>
-                        <div className={styles.messagesContainer}>
-                            {messages.map((message, index) => (
-                                <div
-                                    key={message.id}
-                                    className={`${styles.message} ${styles[message.type]} ${styles.fadeIn}`}
-                                    style={{ animationDelay: `${index * 0.1}s` }}
-                                >
-                                    {message.type === 'ai' && (
-                                        <div className={styles.aiAvatar}>🤖</div>
-                                    )}
-                                    <div className={styles.messageContent}>
-                                        <pre className={styles.messageText}>{message.content}</pre>
-                                        {message.format && (
-                                            <span className={styles.formatTag}>
-                                                {formatModes.find(m => m.id === message.format)?.icon} {message.format}
-                                            </span>
-                                        )}
+                                {/* Input Area */}
+                                <div className={styles.inputContainer}>
+                                    <div className={styles.inputBox}>
+                                        <textarea
+                                            ref={inputRef}
+                                            className={styles.textInput}
+                                            placeholder={t('askAnything')}
+                                            value={inputText}
+                                            onChange={(e) => setInputText(e.target.value)}
+                                            onKeyDown={handleKeyPress}
+                                            rows={1}
+                                        />
+                                        <div className={styles.inputActions}>
+                                            <button className={styles.toolBtn} title="Add attachment">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                className={styles.sendBtn}
+                                                onClick={() => handleSend()}
+                                                disabled={!inputText.trim()}
+                                            >
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
 
-                        {/* Input Section */}
-                        <div className={styles.inputSection}>
-                            <div className={styles.inputWrapper}>
-                                <textarea
-                                    className={styles.textInput}
-                                    placeholder="Ask me anything... (Press Enter to send)"
-                                    value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
-                                    onKeyDown={handleKeyPress}
-                                    rows={1}
-                                />
-                                <div className={styles.inputActions}>
-                                    {/* Image Upload */}
-                                    <button className={styles.actionBtn} title="Upload Image">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                            <circle cx="8.5" cy="8.5" r="1.5" />
-                                            <polyline points="21 15 16 10 5 21" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Voice Input */}
-                                    <button
-                                        className={`${styles.actionBtn} ${styles.voiceBtn} ${isRecording ? styles.recording : ''}`}
-                                        onClick={() => setIsRecording(!isRecording)}
-                                        title="Voice Input"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                                            <line x1="12" y1="19" x2="12" y2="23" />
-                                            <line x1="8" y1="23" x2="16" y2="23" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Send Button */}
-                                    <button
-                                        className={styles.sendBtn}
-                                        onClick={handleSend}
-                                        disabled={!inputText.trim()}
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <line x1="22" y1="2" x2="11" y2="13" />
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                                        </svg>
-                                    </button>
+                                {/* Quick Actions */}
+                                <div className={styles.quickActions}>
+                                    {quickActions.map((action) => (
+                                        <button
+                                            key={action.label}
+                                            className={styles.actionChip}
+                                            onClick={() => handleQuickAction(action.label)}
+                                        >
+                                            <span>{action.icon}</span>
+                                            {action.label}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Settings Sidebar */}
-                    <aside className={`${styles.settingsPanel} ${showSettings ? styles.visible : ''}`}>
-                        <div className={styles.settingsHeader}>
-                            <h3>Learning Settings</h3>
-                        </div>
-
-                        {/* Subject Selection */}
-                        <div className={styles.settingGroup}>
-                            <label className={styles.settingLabel}>Subject / Topic</label>
-                            <select
-                                className={styles.select}
-                                value={selectedSubject}
-                                onChange={(e) => setSelectedSubject(e.target.value)}
-                            >
-                                {subjects.map(subject => (
-                                    <option key={subject} value={subject}>{subject}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Grade Selection */}
-                        <div className={styles.settingGroup}>
-                            <label className={styles.settingLabel}>Grade Level</label>
-                            <div className={styles.gradeButtons}>
-                                {grades.map(grade => (
-                                    <button
-                                        key={grade}
-                                        className={`${styles.gradeBtn} ${selectedGrade === grade ? styles.active : ''}`}
-                                        onClick={() => setSelectedGrade(grade)}
+                    ) : (
+                        <div className={styles.chatScreen}>
+                            <div className={styles.messagesArea}>
+                                {messages.map((message) => (
+                                    <div
+                                        key={message.id}
+                                        className={`${styles.message} ${styles[message.type]}`}
                                     >
-                                        {grade}
-                                    </button>
+                                        {message.type === 'ai' && (
+                                            <div className={styles.aiAvatar}>🤖</div>
+                                        )}
+                                        <div className={styles.messageContent}>
+                                            <pre className={styles.messageText}>{message.content}</pre>
+                                        </div>
+                                        {message.type === 'user' && (
+                                            <div className={styles.userAvatar}>👤</div>
+                                        )}
+                                    </div>
                                 ))}
+                                {isTyping && (
+                                    <div className={`${styles.message} ${styles.ai}`}>
+                                        <div className={styles.aiAvatar}>🤖</div>
+                                        <div className={styles.typingIndicator}>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
                             </div>
-                        </div>
 
-                        {/* Difficulty Slider */}
-                        <div className={styles.settingGroup}>
-                            <label className={styles.settingLabel}>Difficulty</label>
-                            <div className={styles.difficultySlider}>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="3"
-                                    value={difficulty}
-                                    onChange={(e) => setDifficulty(Number(e.target.value))}
-                                    className={styles.slider}
-                                />
-                                <div className={styles.difficultyLabels}>
-                                    <span className={difficulty === 1 ? styles.active : ''}>Easy</span>
-                                    <span className={difficulty === 2 ? styles.active : ''}>Medium</span>
-                                    <span className={difficulty === 3 ? styles.active : ''}>Hard</span>
+                            {/* Chat Input */}
+                            <div className={styles.chatInputContainer}>
+                                <div className={styles.inputBox}>
+                                    <textarea
+                                        ref={inputRef}
+                                        className={styles.textInput}
+                                        placeholder={t('askAnything')}
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                        onKeyDown={handleKeyPress}
+                                        rows={1}
+                                    />
+                                    <div className={styles.inputActions}>
+                                        <button className={styles.toolBtn} title="Add attachment">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            className={styles.sendBtn}
+                                            onClick={() => handleSend()}
+                                            disabled={!inputText.trim()}
+                                        >
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <line x1="22" y1="2" x2="11" y2="13" />
+                                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Quick Actions */}
-                        <div className={styles.quickActions}>
-                            <button className={styles.quickActionBtn}>
-                                <span>📚</span> Explain Topic
-                            </button>
-                            <button className={styles.quickActionBtn}>
-                                <span>❓</span> Practice Quiz
-                            </button>
-                            <button className={styles.quickActionBtn}>
-                                <span>🔍</span> Solve Problem
-                            </button>
-                        </div>
-                    </aside>
-                </div>
+                    )}
+                </main>
             </div>
         </div>
     );
