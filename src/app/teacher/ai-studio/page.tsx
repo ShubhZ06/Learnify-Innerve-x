@@ -56,8 +56,18 @@ const initialEdges: Edge[] = [
 
 interface Message {
     id: number;
-    type: 'user' | 'ai';
+    type: 'user' | 'ai' | 'system';
     content: string;
+}
+
+interface LogicStep {
+    step: number;
+    ui_component: string;
+    api_call?: 'generation' | 'grounding' | 'code_execution';
+    prompt_payload?: string;
+    context_from?: number;
+    instruction?: string;
+    action?: string;
 }
 
 export default function AIStudioPage() {
@@ -69,14 +79,87 @@ export default function AIStudioPage() {
     const [outputContent, setOutputContent] = useState<string>('');
     const [appName, setAppName] = useState('Untitled App');
     const [isSaved, setIsSaved] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [logicFlow, setLogicFlow] = useState<LogicStep[]>([]);
+    const [currentStep, setCurrentStep] = useState<number>(0);
+    const [stepResults, setStepResults] = useState<Record<number, string>>({});
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#3b82f6' } }, eds)),
         [setEdges]
     );
 
-    const handleSendMessage = () => {
-        if (!prompt.trim()) return;
+    // Call Opal API to generate logic flow
+    const generateLogicFlow = async (appIdea: string): Promise<LogicStep[]> => {
+        const response = await fetch('/api/opal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ app_idea: appIdea }),
+        });
+        const data = await response.json();
+        if (data.success && data.logic_flow) {
+            return data.logic_flow;
+        }
+        throw new Error(data.error || 'Failed to generate logic flow');
+    };
+
+    // Execute a step in the logic flow
+    const executeStep = async (step: LogicStep, context: Record<number, string>): Promise<string> => {
+        const response = await fetch('/api/opal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                logic_flow: logicFlow,
+                execute_step: step.step,
+                context,
+            }),
+        });
+        const data = await response.json();
+        if (data.success && data.step_result) {
+            return data.step_result.output;
+        }
+        throw new Error(data.error || 'Failed to execute step');
+    };
+
+    // Run all steps in sequence
+    const runLogicFlow = async (flow: LogicStep[]) => {
+        const results: Record<number, string> = {};
+
+        for (const step of flow) {
+            setCurrentStep(step.step);
+
+            const systemMsg: Message = {
+                id: Date.now(),
+                type: 'system',
+                content: `⚡ Executing Step ${step.step}: ${step.ui_component}${step.api_call ? ` (${step.api_call})` : ''}`,
+            };
+            setMessages((prev) => [...prev, systemMsg]);
+
+            try {
+                const output = await executeStep(step, results);
+                results[step.step] = output;
+                setStepResults({ ...results });
+
+                if (step.action === 'RENDER' || step.action === 'RENDER_FINAL_TEXT') {
+                    setOutputContent(output);
+                }
+            } catch (error) {
+                const errorMsg: Message = {
+                    id: Date.now(),
+                    type: 'ai',
+                    content: `❌ Step ${step.step} failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                };
+                setMessages((prev) => [...prev, errorMsg]);
+                break;
+            }
+        }
+
+        setCurrentStep(0);
+        return results;
+    };
+
+    const handleSendMessage = async () => {
+        if (!prompt.trim() || isLoading) return;
 
         const userMessage: Message = {
             id: Date.now(),
@@ -86,20 +169,41 @@ export default function AIStudioPage() {
 
         setMessages((prev) => [...prev, userMessage]);
         setIsSaved(false);
+        setIsLoading(true);
 
-        // Simulate AI response
-        setTimeout(() => {
-            const aiResponse: Message = {
-                id: Date.now() + 1,
+        try {
+            // Call API with direct chat mode
+            const response = await fetch('/api/opal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: prompt }),
+            });
+            const data = await response.json();
+
+            if (data.success && data.chat_response) {
+                const aiResponse: Message = {
+                    id: Date.now() + 1,
+                    type: 'ai',
+                    content: data.chat_response,
+                };
+                setMessages((prev) => [...prev, aiResponse]);
+                setOutputContent(data.chat_response);
+            } else {
+                throw new Error(data.error || 'Failed to get response');
+            }
+
+        } catch (error) {
+            const errorMsg: Message = {
+                id: Date.now() + 5,
                 type: 'ai',
-                content: `I'll help you build that! Based on your request "${prompt}", I'm generating the content...`,
+                content: `❌ Error: ${error instanceof Error ? error.message : 'Something went wrong'}`,
             };
-            setMessages((prev) => [...prev, aiResponse]);
-            setOutputContent(`Generated output for: ${prompt}`);
+            setMessages((prev) => [...prev, errorMsg]);
+        } finally {
+            setIsLoading(false);
             setIsSaved(true);
-        }, 1000);
-
-        setPrompt('');
+            setPrompt('');
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -136,8 +240,8 @@ export default function AIStudioPage() {
                         onChange={(e) => { setAppName(e.target.value); setIsSaved(false); }}
                         className={styles.appNameInput}
                     />
-                    <span className={styles.experimentBadge}>EXPERIMENT</span>
-                    <span className={styles.draftBadge}>Draft</span>
+                    <span className={styles.experimentBadge}>OPAL</span>
+                    <span className={styles.draftBadge}>{isLoading ? 'Processing...' : 'Ready'}</span>
                 </div>
                 <div className={styles.topBarCenter}>
                     <button
@@ -225,12 +329,12 @@ export default function AIStudioPage() {
                                                 <polygon points="45,5 55,10 48,18" fill="#3b82f6" />
                                             </svg>
                                         </div>
-                                        <h1 className={styles.heroTitle}>Let&apos;s build your app</h1>
+                                        <h1 className={styles.heroTitle}>Opal Bridge Ready</h1>
                                         <p className={styles.heroSubtitle}>
-                                            Take a look at our <a href="#" className={styles.demoLink}>demo video</a>
+                                            Powered by <span style={{ color: '#3b82f6', fontWeight: 600 }}>Gemini 2.0 Flash</span>
                                         </p>
                                         <div className={styles.annotation2}>
-                                            <span className={styles.annotationText}>... or type what you want to build</span>
+                                            <span className={styles.annotationText}>Describe your app idea below</span>
                                             <svg width="60" height="80" viewBox="0 0 60 80" className={styles.arrow2}>
                                                 <path d="M30 0 Q 30 40, 30 70" stroke="#3b82f6" strokeWidth="2" fill="none" />
                                                 <polygon points="25,65 30,80 35,65" fill="#3b82f6" />
@@ -242,11 +346,17 @@ export default function AIStudioPage() {
                                         {messages.map((msg) => (
                                             <div
                                                 key={msg.id}
-                                                className={`${styles.message} ${msg.type === 'user' ? styles.userMessage : styles.aiMessage}`}
+                                                className={`${styles.message} ${msg.type === 'user' ? styles.userMessage : msg.type === 'system' ? styles.systemMessage : styles.aiMessage}`}
                                             >
                                                 {msg.content}
                                             </div>
                                         ))}
+                                        {isLoading && currentStep > 0 && (
+                                            <div className={styles.loadingIndicator}>
+                                                <div className={styles.spinner}></div>
+                                                <span>Processing Step {currentStep}...</span>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -259,10 +369,11 @@ export default function AIStudioPage() {
                                         value={prompt}
                                         onChange={(e) => setPrompt(e.target.value)}
                                         onKeyPress={handleKeyPress}
-                                        placeholder="Describe what you want to build"
+                                        placeholder="e.g., Build a tool that finds company CEOs and writes welcome emails"
                                         className={styles.promptInput}
+                                        disabled={isLoading}
                                     />
-                                    <button className={styles.micBtn}>
+                                    <button className={styles.micBtn} disabled={isLoading}>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
                                             <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
@@ -270,11 +381,15 @@ export default function AIStudioPage() {
                                             <line x1="8" y1="23" x2="16" y2="23" />
                                         </svg>
                                     </button>
-                                    <button className={styles.sendBtn} onClick={handleSendMessage}>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <line x1="22" y1="2" x2="11" y2="13" />
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                                        </svg>
+                                    <button className={styles.sendBtn} onClick={handleSendMessage} disabled={isLoading}>
+                                        {isLoading ? (
+                                            <div className={styles.btnSpinner}></div>
+                                        ) : (
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <line x1="22" y1="2" x2="11" y2="13" />
+                                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                            </svg>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -285,8 +400,8 @@ export default function AIStudioPage() {
                             <div className={styles.outputTabs}>
                                 <button className={`${styles.outputTab} ${styles.outputTabActive}`}>Preview</button>
                                 <button className={styles.outputTab}>Console</button>
-                                <button className={styles.outputTab}>Step</button>
-                                <button className={styles.outputTab}>Theme</button>
+                                <button className={styles.outputTab}>Flow</button>
+                                <button className={styles.outputTab}>JSON</button>
                             </div>
                             <div className={styles.outputContent}>
                                 {outputContent ? (
@@ -297,7 +412,17 @@ export default function AIStudioPage() {
                                     </div>
                                 ) : (
                                     <div className={styles.emptyPreview}>
-                                        <p>Your app will appear here once it&apos;s built</p>
+                                        <p>Your generated content will appear here</p>
+                                        {logicFlow.length > 0 && (
+                                            <div className={styles.flowPreview}>
+                                                <h4>Logic Flow:</h4>
+                                                {logicFlow.map((step) => (
+                                                    <div key={step.step} className={`${styles.flowStep} ${currentStep === step.step ? styles.activeStep : ''}`}>
+                                                        Step {step.step}: {step.ui_component}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>

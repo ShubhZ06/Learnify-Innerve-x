@@ -541,3 +541,103 @@
 :global(.react-flow__controls-button:hover) {
     background: #f1f5f9;
 }
+
+/* System Message */
+.systemMessage {
+    background: #fef3c7;
+    color: #92400e;
+    align-self: center;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    padding: 12px 16px;
+    border: 1px solid #fcd34d;
+}
+
+/* Loading Indicator */
+.loadingIndicator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #f0f9ff;
+    border-radius: 12px;
+    color: #0369a1;
+    align-self: center;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #bae6fd;
+    border-top-color: #0369a1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.btnSpinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Flow Preview in Output Panel */
+.flowPreview {
+    margin-top: 20px;
+    text-align: left;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.flowPreview h4 {
+    margin-bottom: 12px;
+    color: #1e293b;
+    font-size: 0.875rem;
+}
+
+.flowStep {
+    padding: 8px 12px;
+    background: #ffffff;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 0.8125rem;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.flowStep:last-child {
+    margin-bottom: 0;
+}
+
+.activeStep {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+/* Disabled states */
+.promptInput:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sendBtn:disabled,
+.micBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sendBtn:disabled:hover {
+    transform: none;
+}
+
