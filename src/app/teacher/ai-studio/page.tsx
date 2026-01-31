@@ -34,6 +34,7 @@ export default function AIStudioPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showAddMenu, setShowAddMenu] = useState(false);
     const [showTemplates, setShowTemplates] = useState(false);
+    const [activeTab, setActiveTab] = useState<'preview' | 'logs' | 'json' | 'share'>('preview');
 
     // Publishing state
     const [teacherClassrooms, setTeacherClassrooms] = useState<{ _id: string, name: string, code: string }[]>([]);
@@ -415,21 +416,103 @@ export default function AIStudioPage() {
                 {/* Preview Panel (Right Side) */}
                 <aside className={`${styles.previewPanel} ${isPreviewOpen ? styles.previewOpen : ''}`}>
                     <div className={styles.previewHeader}>
-                        <h3>Preview</h3>
+                        <h3>Output Panel</h3>
                         <button className={styles.closeBtn} onClick={() => setPreviewOpen(false)}>✕</button>
                     </div>
-                    <div className={styles.previewContent}>
-                        {isExecuting ? (
-                            <div className={styles.executing}>
-                                <div className={styles.bigSpinner}></div>
-                                <p>Executing workflow...</p>
-                            </div>
-                        ) : getFinalOutput() ? (
-                            <div className={styles.outputResult}>
-                                <h4>Output</h4>
-                                <OutputRenderer content={getFinalOutput() || ''} />
 
-                                {/* Publish Section */}
+                    {/* Tab Bar */}
+                    <div className={styles.tabBar}>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'preview' ? styles.tabActive : ''}`}
+                            onClick={() => setActiveTab('preview')}
+                        >
+                            <span className={styles.tabIcon}>👁️</span>
+                            Preview
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'logs' ? styles.tabActive : ''}`}
+                            onClick={() => setActiveTab('logs')}
+                        >
+                            <span className={styles.tabIcon}>📋</span>
+                            Logs
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'json' ? styles.tabActive : ''}`}
+                            onClick={() => setActiveTab('json')}
+                        >
+                            <span className={styles.tabIcon}>{ }</span>
+                            JSON
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'share' ? styles.tabActive : ''}`}
+                            onClick={() => setActiveTab('share')}
+                        >
+                            <span className={styles.tabIcon}>📤</span>
+                            Share
+                        </button>
+                    </div>
+
+                    <div className={styles.tabContent}>
+                        {/* Preview Tab */}
+                        <div className={`${styles.tabPanel} ${activeTab === 'preview' ? styles.tabPanelActive : ''}`}>
+                            {isExecuting ? (
+                                <div className={styles.executing}>
+                                    <div className={styles.bigSpinner}></div>
+                                    <p>Executing workflow...</p>
+                                </div>
+                            ) : getFinalOutput() ? (
+                                <div className={styles.outputResult}>
+                                    <h4>Output</h4>
+                                    <OutputRenderer content={getFinalOutput() || ''} />
+                                </div>
+                            ) : (
+                                <div className={styles.emptyPreview}>
+                                    <p>Click "Run" to execute the workflow</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Logs Tab */}
+                        <div className={`${styles.tabPanel} ${activeTab === 'logs' ? styles.tabPanelActive : ''}`}>
+                            {executionLogs.length > 0 ? (
+                                <div className={styles.logsSection}>
+                                    <h4>Execution Logs</h4>
+                                    <div className={styles.logsList}>
+                                        {executionLogs.map(log => (
+                                            <div key={log.id} className={`${styles.logEntry} ${styles[`log_${log.level}`]}`}>
+                                                {log.message}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={styles.emptyPreview}>
+                                    <p>No logs yet. Run a workflow to see logs.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* JSON View Tab */}
+                        <div className={`${styles.tabPanel} ${activeTab === 'json' ? styles.tabPanelActive : ''}`}>
+                            {getFinalOutput() ? (
+                                <div className={styles.jsonView}>
+                                    <pre>{JSON.stringify({
+                                        workflow: currentDAG?.name,
+                                        executedAt: new Date().toISOString(),
+                                        nodeOutputs: nodeOutputs,
+                                        finalOutput: getFinalOutput()
+                                    }, null, 2)}</pre>
+                                </div>
+                            ) : (
+                                <div className={styles.emptyPreview}>
+                                    <p>No JSON output yet. Run a workflow to see raw data.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Share Tab */}
+                        <div className={`${styles.tabPanel} ${activeTab === 'share' ? styles.tabPanelActive : ''}`}>
+                            {getFinalOutput() ? (
                                 <div className={styles.publishSection}>
                                     <h4>📤 Publish to Classroom</h4>
 
@@ -542,26 +625,12 @@ export default function AIStudioPage() {
                                         {isPublishing ? 'Publishing...' : `Publish to ${selectedClassrooms.length} Classroom(s)`}
                                     </button>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className={styles.emptyPreview}>
-                                <p>Click "Run" to execute the workflow</p>
-                            </div>
-                        )}
-
-                        {/* Execution Logs */}
-                        {executionLogs.length > 0 && (
-                            <div className={styles.logsSection}>
-                                <h4>Logs</h4>
-                                <div className={styles.logsList}>
-                                    {executionLogs.map(log => (
-                                        <div key={log.id} className={`${styles.logEntry} ${styles[`log_${log.level}`]}`}>
-                                            {log.message}
-                                        </div>
-                                    ))}
+                            ) : (
+                                <div className={styles.emptyPreview}>
+                                    <p>Run a workflow first to share the output</p>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </aside>
             </div>
