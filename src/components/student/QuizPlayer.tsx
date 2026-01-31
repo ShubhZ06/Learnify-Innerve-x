@@ -20,6 +20,7 @@ interface Question {
     options: string[];
     correct: number;
     explanation?: string;
+    answer?: string;
 }
 
 interface QuizPlayerProps {
@@ -49,6 +50,30 @@ export default function QuizPlayer({
     const [finalResult, setFinalResult] = useState<{ score: number; total: number; percentage: number } | null>(null);
 
     const question = questions[currentQuestion];
+
+    // Helper to determine the correct index dynamically
+    const getCorrectIndex = (q: Question): number => {
+        // 1. Try numeric 'correct' field (handling string numbers like "1")
+        const numericCorrect = Number(q.correct);
+        if (!isNaN(numericCorrect) && numericCorrect >= 0 && numericCorrect < q.options.length) {
+            return numericCorrect;
+        }
+
+        // 2. Try parsing 'answer' string field (e.g., "Answer: B)", "B", "Option B")
+        if (q.answer) {
+            const cleanAnswer = q.answer.trim();
+            // Regex to find "A", "B", "C", "D" at the start, or after "Answer:"
+            const match = cleanAnswer.match(/(?:^|Answer:?|Option)\s*([A-D])(?:$|[\s).:])/i);
+
+            if (match && match[1]) {
+                return match[1].toUpperCase().charCodeAt(0) - 65;
+            }
+        }
+
+        return -1; // Could not determine
+    };
+
+    const currentCorrectIndex = getCorrectIndex(question);
 
     const handleAnswerSelect = (optionIndex: number) => {
         if (showResult) return;
@@ -83,7 +108,8 @@ export default function QuizPlayer({
     const calculateScore = () => {
         return answers.reduce((acc: number, answer, idx) => {
             if (answer === null) return acc;
-            return Number(answer) === Number(questions[idx]?.correct) ? acc + 1 : acc;
+            const q = questions[idx];
+            return Number(answer) === getCorrectIndex(q) ? acc + 1 : acc;
         }, 0);
     };
 
@@ -188,23 +214,23 @@ export default function QuizPlayer({
                             key={idx}
                             className={`${styles.optionBtn} 
                                 ${selectedAnswer === idx ? styles.selected : ''} 
-                                ${showResult && idx === Number(question.correct) ? styles.correct : ''} 
-                                ${showResult && selectedAnswer === idx && idx !== Number(question.correct) ? styles.incorrect : ''}`}
+                                ${showResult && idx === currentCorrectIndex ? styles.correct : ''} 
+                                ${showResult && selectedAnswer === idx && idx !== currentCorrectIndex ? styles.incorrect : ''}`}
                             onClick={() => handleAnswerSelect(idx)}
                             disabled={showResult}
                         >
                             <span className={styles.optionLetter}>{String.fromCharCode(65 + idx)}</span>
                             <span className={styles.optionText}>{option}</span>
-                            {showResult && idx === Number(question.correct) && <Check size={20} className={styles.checkIcon} />}
-                            {showResult && selectedAnswer === idx && idx !== Number(question.correct) && <X size={20} className={styles.wrongIcon} />}
+                            {showResult && idx === currentCorrectIndex && <Check size={20} className={styles.checkIcon} />}
+                            {showResult && selectedAnswer === idx && idx !== currentCorrectIndex && <X size={20} className={styles.wrongIcon} />}
                         </button>
                     ))}
                 </div>
 
                 {showResult && question.explanation && (
-                    <div className={`${styles.explanation} ${selectedAnswer === Number(question.correct) ? styles.correctExp : styles.incorrectExp}`}>
+                    <div className={`${styles.explanation} ${selectedAnswer === currentCorrectIndex ? styles.correctExp : styles.incorrectExp}`}>
                         <div className="flex items-center gap-2 font-bold mb-1">
-                            {selectedAnswer === Number(question.correct) ? (
+                            {selectedAnswer === currentCorrectIndex ? (
                                 <><CheckCircle size={18} /> Correct!</>
                             ) : (
                                 <><XCircle size={18} /> Incorrect</>

@@ -65,9 +65,28 @@ export async function POST(request: NextRequest) {
 
         // Calculate score
         let correctCount = 0;
+
+        // Helper to mimic frontend logic
+        const getCorrectIndex = (q: any): number => {
+            const numericCorrect = Number(q.correct);
+            if (!isNaN(numericCorrect) && numericCorrect >= 0 && numericCorrect < (q.options?.length || 4)) {
+                return numericCorrect;
+            }
+            if (q.answer) {
+                const cleanAnswer = String(q.answer).trim();
+                const match = cleanAnswer.match(/(?:^|Answer:?|Option)\s*([A-D])(?:$|[\s).:])/i);
+                if (match && match[1]) {
+                    return match[1].toUpperCase().charCodeAt(0) - 65;
+                }
+            }
+            return -1;
+        };
+
         const processedAnswers = answers.map((answer: { questionIndex: number; selectedAnswer: number }) => {
             const question = questions[answer.questionIndex];
-            const isCorrect = question && Number(answer.selectedAnswer) === Number(question.correct);
+            const correctIndex = question ? getCorrectIndex(question) : -1;
+            const isCorrect = question && Number(answer.selectedAnswer) === correctIndex;
+
             if (isCorrect) correctCount++;
             return {
                 questionIndex: answer.questionIndex,
