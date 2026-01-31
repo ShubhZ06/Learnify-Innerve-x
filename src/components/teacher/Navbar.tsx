@@ -40,7 +40,7 @@ export default function Navbar() {
                             <path d="M8 12L11 15L16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
-                    <span className={styles.logoText}>Shiksha AI</span>
+                    <span className={styles.logoText}>Learnify</span>
                 </Link>
 
                 {/* Nav Links */}
@@ -107,7 +107,7 @@ export default function Navbar() {
                                     />
                                     <div className={styles.profileInfo}>
                                         <span className={styles.profileName}>{session?.user?.name || 'Teacher'}</span>
-                                        <span className={styles.profileClass}>{session?.user?.email || 'shiksha@ai.com'}</span>
+                                        <span className={styles.profileClass}>{session?.user?.email || 'admin@learnify.com'}</span>
                                     </div>
                                 </div>
                                 <div className={styles.menuDivider} />

@@ -10,7 +10,7 @@ export default function AboutPage() {
             <div className={styles.mainContainer}>
                 {/* Hero Section */}
                 <div className={styles.hero}>
-                    <h1 className={styles.heroTitle}>About Shiksha AI</h1>
+                    <h1 className={styles.heroTitle}>About Learnify</h1>
                     <p className={styles.heroDesc}>
                         Empowering students with AI-powered personalized learning
                     </p>
@@ -20,7 +20,7 @@ export default function AboutPage() {
                 <div className={styles.section}>
                     <h2>🎯 Our Mission</h2>
                     <p>
-                        At Shiksha AI, we believe every student deserves access to quality education tailored to their unique learning style.
+                        At Learnify, we believe every student deserves access to quality education tailored to their unique learning style.
                         Our mission is to bridge the gap between traditional education and modern technology, making learning more engaging,
                         effective, and accessible for students across India.
                     </p>
@@ -86,7 +86,7 @@ export default function AboutPage() {
                 {/* Version */}
                 <div className={styles.versionInfo}>
                     <p>Version 2.0.1</p>
-                    <p>© 2026 Shiksha AI. All rights reserved.</p>
+                    <p>© 2026 Learnify. All rights reserved.</p>
                 </div>
             </div>
         </div>

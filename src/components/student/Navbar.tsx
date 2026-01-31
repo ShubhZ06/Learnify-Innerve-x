@@ -74,7 +74,7 @@ export default function Navbar() {
                             <path d="M8 12L11 15L16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
-                    <span className={styles.logoText}>Shiksha AI</span>
+                    <span className={styles.logoText}>Learnify</span>
                 </Link>
 
                 {/* Nav Links */}
@@ -92,14 +92,7 @@ export default function Navbar() {
 
                 {/* Right Section */}
                 <div className={styles.rightSection}>
-                    {/* Learning Streak */}
-                    <div className={styles.streakCounter}>
-                        <span className={styles.streakFlame}><Flame size={20} fill="#f59e0b" strokeWidth={0} /></span>
-                        <div className={styles.streakInfo}>
-                            <span className={styles.streakNumber}>14</span>
-                            <span className={styles.streakLabel}>Day Streak</span>
-                        </div>
-                    </div>
+
 
                     {/* Notifications */}
                     <div className={styles.notifWrapper} ref={notifRef}>

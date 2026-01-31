@@ -16,13 +16,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Shiksha AI",
+  title: "Learnify",
   description: "AI-powered education platform for teachers and students",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Shiksha AI",
+    title: "Learnify",
   },
 };
 

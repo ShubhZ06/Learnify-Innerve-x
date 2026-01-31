@@ -98,7 +98,7 @@ export default function ContactPage() {
                         <div className={styles.infoCard}>
                             <span className={styles.infoIcon}>✉️</span>
                             <h3>Email Us</h3>
-                            <p>support@shikshaai.edu</p>
+                            <p>support@learnify.com</p>
                             <span className={styles.infoNote}>Response within 24 hours</span>
                         </div>
                         <div className={styles.infoCard}>
