@@ -17,6 +17,7 @@ interface Resource {
     size?: string;
     duration?: string;
     link?: string;
+    fileUrl?: string; // Cloudinary URL
     imageUrl?: string;
     aiContent?: string;
 }
@@ -47,17 +48,19 @@ export default function LibraryPage() {
     const [resources, setResources] = useState<Resource[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Initial load
-    // Initial load
+    // Initial load and filter change
     useEffect(() => {
-        // searchResources('science'); // Default search removed as per user request
-    }, []);
+        searchResources(searchQuery);
+    }, [selectedType]);
 
-    const searchResources = async (query: string) => {
-        if (!query.trim()) return;
+    const searchResources = async (query: string = '') => {
         setIsLoading(true);
         try {
-            const res = await fetch(`/api/library/search?q=${encodeURIComponent(query)}`);
+            const params = new URLSearchParams();
+            if (query.trim()) params.append('search', query);
+            if (selectedType !== 'all') params.append('type', selectedType);
+
+            const res = await fetch(`/api/student/library?${params.toString()}`);
             const data = await res.json();
             if (data.resources) {
                 setResources(data.resources);
@@ -299,14 +302,20 @@ export default function LibraryPage() {
                                         </div>
                                     </div>
                                     <div className={styles.recordingActions}>
-                                        <button className={styles.actionBtn}>
+                                        <a
+                                            href={rec.fileUrl || rec.link || '#'}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={styles.actionBtn}
+                                            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
+                                        >
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                                 <polyline points="7 10 12 15 17 10" />
                                                 <line x1="12" y1="15" x2="12" y2="3" />
                                             </svg>
                                             Download
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             ))}
@@ -344,13 +353,7 @@ export default function LibraryPage() {
                                 <p className={styles.previewDescription}>{selectedResource.description}</p>
 
                                 <a
-                                    href={
-                                        selectedResource.aiContent
-                                            ? `/api/library/download?content=${encodeURIComponent(selectedResource.aiContent)}&title=${selectedResource.title}`
-                                            : ['pdf', 'doc', 'ppt'].includes(selectedResource.type)
-                                                ? `/api/library/download?url=${encodeURIComponent(selectedResource.link || '')}&title=${selectedResource.title}`
-                                                : selectedResource.link || '#'
-                                    }
+                                    href={selectedResource.fileUrl || selectedResource.link || '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.downloadBtn}
@@ -361,7 +364,7 @@ export default function LibraryPage() {
                                         <polyline points="7 10 12 15 17 10" />
                                         <line x1="12" y1="15" x2="12" y2="3" />
                                     </svg>
-                                    {selectedResource.type === 'link' || selectedResource.type === 'video' ? 'Open Resource' : 'Download'}
+                                    {selectedResource.type === 'link' || selectedResource.type === 'video' ? 'Open Resource' : 'View / Download'}
                                 </a>
 
                                 <div className={styles.secondaryActions}>
