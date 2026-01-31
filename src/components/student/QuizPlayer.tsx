@@ -82,7 +82,8 @@ export default function QuizPlayer({
 
     const calculateScore = () => {
         return answers.reduce((acc: number, answer, idx) => {
-            return answer === questions[idx]?.correct ? acc + 1 : acc;
+            if (answer === null) return acc;
+            return Number(answer) === Number(questions[idx]?.correct) ? acc + 1 : acc;
         }, 0);
     };
 
@@ -187,23 +188,23 @@ export default function QuizPlayer({
                             key={idx}
                             className={`${styles.optionBtn} 
                                 ${selectedAnswer === idx ? styles.selected : ''} 
-                                ${showResult && idx === question.correct ? styles.correct : ''} 
-                                ${showResult && selectedAnswer === idx && idx !== question.correct ? styles.incorrect : ''}`}
+                                ${showResult && idx === Number(question.correct) ? styles.correct : ''} 
+                                ${showResult && selectedAnswer === idx && idx !== Number(question.correct) ? styles.incorrect : ''}`}
                             onClick={() => handleAnswerSelect(idx)}
                             disabled={showResult}
                         >
                             <span className={styles.optionLetter}>{String.fromCharCode(65 + idx)}</span>
                             <span className={styles.optionText}>{option}</span>
-                            {showResult && idx === question.correct && <Check size={20} className={styles.checkIcon} />}
-                            {showResult && selectedAnswer === idx && idx !== question.correct && <X size={20} className={styles.wrongIcon} />}
+                            {showResult && idx === Number(question.correct) && <Check size={20} className={styles.checkIcon} />}
+                            {showResult && selectedAnswer === idx && idx !== Number(question.correct) && <X size={20} className={styles.wrongIcon} />}
                         </button>
                     ))}
                 </div>
 
                 {showResult && question.explanation && (
-                    <div className={`${styles.explanation} ${selectedAnswer === question.correct ? styles.correctExp : styles.incorrectExp}`}>
+                    <div className={`${styles.explanation} ${selectedAnswer === Number(question.correct) ? styles.correctExp : styles.incorrectExp}`}>
                         <div className="flex items-center gap-2 font-bold mb-1">
-                            {selectedAnswer === question.correct ? (
+                            {selectedAnswer === Number(question.correct) ? (
                                 <><CheckCircle size={18} /> Correct!</>
                             ) : (
                                 <><XCircle size={18} /> Incorrect</>

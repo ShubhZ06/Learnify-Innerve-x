@@ -1,15 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './MaterialModal.module.css';
-
-interface Question {
-    id?: number;
-    question: string;
-    options: string[];
-    correct: number;
-    explanation?: string;
-}
+import QuizPlayer from './QuizPlayer';
 
 interface Flashcard {
     front: string;
@@ -28,28 +22,37 @@ interface MaterialModalProps {
         createdAt?: string;
     };
     onClose: () => void;
+    // classroomId is needed for QuizPlayer to save results
+    // We can try to get it from URL params or assume it's available via props in a real app
+    // For now we will accept it as an optional prop or fallback to URL extraction if needed,
+    // but the component calling this usually knows the context.
+    // However, looking at usage in EnrolledClassrooms, it doesn't pass classroomId.
+    // We'll update the interface to accept it, but for now we might need to extract it from URL.
 }
 
 export default function MaterialModal({ material, onClose }: MaterialModalProps) {
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-    const [showResult, setShowResult] = useState(false);
-    const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([]);
-    const [quizComplete, setQuizComplete] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [currentCard, setCurrentCard] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
 
-    // Parse quiz questions from jsonData
-    const getQuizQuestions = (): Question[] => {
-        if (!material.jsonData) return [];
-        if (Array.isArray(material.jsonData.questions)) {
-            return material.jsonData.questions;
-        }
-        if (Array.isArray(material.jsonData)) {
-            return material.jsonData;
-        }
-        return [];
-    };
+    useEffect(() => {
+        setMounted(true);
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    // Extract classroomId from URL if possible, since it's not passed as prop
+    // In /student/classroom/[classroomId], we can use useParams, but this modal might be used elsewhere.
+    // Let's rely on window.location for now or safer: useParams from next/navigation
+    // But we need to import useParams.
+
+    // Actually, let's keep it simple. If it's a quiz, we render the QuizPlayer. 
+    // The QuizPlayer needs classroomId. 
+    // We will assume the parent component *should* pass it, but if not we can try to get it from the URL
+    // or pass a dummy one if strictly viewing.
 
     // Parse flashcards from jsonData
     const getFlashcards = (): Flashcard[] => {
@@ -66,49 +69,7 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
         return [];
     };
 
-    const questions = getQuizQuestions();
     const flashcards = getFlashcards();
-
-    // Initialize quiz answers
-    if (questions.length > 0 && quizAnswers.length === 0) {
-        setQuizAnswers(new Array(questions.length).fill(null));
-    }
-
-    const handleAnswerSelect = (optionIndex: number) => {
-        if (showResult) return;
-        setSelectedAnswer(optionIndex);
-        const newAnswers = [...quizAnswers];
-        newAnswers[currentQuestion] = optionIndex;
-        setQuizAnswers(newAnswers);
-    };
-
-    const handleCheckAnswer = () => {
-        setShowResult(true);
-    };
-
-    const handleNextQuestion = () => {
-        if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(currentQuestion + 1);
-            setSelectedAnswer(quizAnswers[currentQuestion + 1]);
-            setShowResult(false);
-        } else {
-            setQuizComplete(true);
-        }
-    };
-
-    const handlePrevQuestion = () => {
-        if (currentQuestion > 0) {
-            setCurrentQuestion(currentQuestion - 1);
-            setSelectedAnswer(quizAnswers[currentQuestion - 1]);
-            setShowResult(quizAnswers[currentQuestion - 1] !== null);
-        }
-    };
-
-    const calculateScore = () => {
-        return quizAnswers.reduce((acc: number, answer, idx) => {
-            return answer === questions[idx]?.correct ? acc + 1 : acc;
-        }, 0);
-    };
 
     const renderArticleContent = () => {
         const content = material.content || material.jsonData?.content || '';
@@ -117,109 +78,6 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
                 <div className={styles.articleText} dangerouslySetInnerHTML={{
                     __html: content.replace(/\n/g, '<br/>')
                 }} />
-            </div>
-        );
-    };
-
-    const renderQuizContent = () => {
-        if (questions.length === 0) {
-            return <div className={styles.emptyContent}>No quiz questions available</div>;
-        }
-
-        if (quizComplete) {
-            const score = calculateScore();
-            const percentage = Math.round((score / questions.length) * 100);
-            return (
-                <div className={styles.quizResults}>
-                    <div className={styles.resultsEmoji}>
-                        {percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '📚'}
-                    </div>
-                    <h3>{percentage >= 80 ? 'Excellent!' : percentage >= 60 ? 'Good Job!' : 'Keep Practicing!'}</h3>
-                    <div className={styles.scoreCircle}>
-                        <span className={styles.scoreValue}>{percentage}%</span>
-                    </div>
-                    <div className={styles.scoreStats}>
-                        <span>✅ Correct: {score}</span>
-                        <span>❌ Incorrect: {questions.length - score}</span>
-                    </div>
-                    <button
-                        className={styles.retryBtn}
-                        onClick={() => {
-                            setCurrentQuestion(0);
-                            setSelectedAnswer(null);
-                            setShowResult(false);
-                            setQuizAnswers(new Array(questions.length).fill(null));
-                            setQuizComplete(false);
-                        }}
-                    >
-                        🔄 Try Again
-                    </button>
-                </div>
-            );
-        }
-
-        const question = questions[currentQuestion];
-        return (
-            <div className={styles.quizContainer}>
-                <div className={styles.quizProgress}>
-                    Question {currentQuestion + 1} of {questions.length}
-                </div>
-                <div className={styles.progressBar}>
-                    <div
-                        className={styles.progressFill}
-                        style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-                    />
-                </div>
-
-                <h3 className={styles.questionText}>{question.question}</h3>
-
-                <div className={styles.optionsList}>
-                    {question.options.map((option, idx) => (
-                        <button
-                            key={idx}
-                            className={`${styles.optionBtn} 
-                                ${selectedAnswer === idx ? styles.selected : ''} 
-                                ${showResult && idx === question.correct ? styles.correct : ''} 
-                                ${showResult && selectedAnswer === idx && idx !== question.correct ? styles.incorrect : ''}`}
-                            onClick={() => handleAnswerSelect(idx)}
-                        >
-                            <span className={styles.optionLetter}>{String.fromCharCode(65 + idx)}</span>
-                            <span>{option}</span>
-                            {showResult && idx === question.correct && <span className={styles.checkIcon}>✓</span>}
-                            {showResult && selectedAnswer === idx && idx !== question.correct && <span className={styles.wrongIcon}>✗</span>}
-                        </button>
-                    ))}
-                </div>
-
-                {showResult && question.explanation && (
-                    <div className={`${styles.explanation} ${selectedAnswer === question.correct ? styles.correctExp : styles.incorrectExp}`}>
-                        <strong>{selectedAnswer === question.correct ? '✅ Correct!' : '❌ Incorrect'}</strong>
-                        <p>{question.explanation}</p>
-                    </div>
-                )}
-
-                <div className={styles.quizNav}>
-                    <button
-                        className={styles.navBtn}
-                        onClick={handlePrevQuestion}
-                        disabled={currentQuestion === 0}
-                    >
-                        ← Previous
-                    </button>
-                    {!showResult ? (
-                        <button
-                            className={styles.checkBtn}
-                            onClick={handleCheckAnswer}
-                            disabled={selectedAnswer === null}
-                        >
-                            Check Answer
-                        </button>
-                    ) : (
-                        <button className={styles.nextBtn} onClick={handleNextQuestion}>
-                            {currentQuestion === questions.length - 1 ? 'Finish Quiz' : 'Next →'}
-                        </button>
-                    )}
-                </div>
             </div>
         );
     };
@@ -271,9 +129,28 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
     };
 
     const renderContent = () => {
+        if (material.type === 'quiz') {
+            // We need classroomId for the QuizPlayer. 
+            // Since we are in the modal, we can try to grab it from the URL
+            const pathParts = window.location.pathname.split('/');
+            const classroomIdIndex = pathParts.indexOf('classroom') + 1;
+            const classroomId = classroomIdIndex > 0 && pathParts[classroomIdIndex] ? pathParts[classroomIdIndex] : 'unknown';
+
+            return (
+                <div className={styles.quizWrapper}>
+                    <QuizPlayer
+                        materialId={material._id}
+                        classroomId={classroomId}
+                        title={material.title}
+                        questions={material.jsonData?.questions || []}
+                        onComplete={() => { }}
+                        onClose={onClose}
+                    />
+                </div>
+            );
+        }
+
         switch (material.type) {
-            case 'quiz':
-                return renderQuizContent();
             case 'article':
             case 'announcement':
             case 'resource':
@@ -282,9 +159,6 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
                 }
                 return renderArticleContent();
             default:
-                if (questions.length > 0) {
-                    return renderQuizContent();
-                }
                 if (flashcards.length > 0) {
                     return renderFlashcards();
                 }
@@ -301,7 +175,17 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
         announcement: '📢'
     };
 
-    return (
+    if (!mounted) return null;
+
+    // Use a portal to render the modal at the end of the document body
+    // This helps avoid layout issues and z-index wars with other fixed elements (like navbar)
+    const modalContent = material.type === 'quiz' ? (
+        <div className={styles.overlay} onClick={onClose}>
+            <div className={`${styles.modal} ${styles.quizModal}`} onClick={(e) => e.stopPropagation()}>
+                {renderContent()}
+            </div>
+        </div>
+    ) : (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
@@ -329,4 +213,6 @@ export default function MaterialModal({ material, onClose }: MaterialModalProps)
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

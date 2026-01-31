@@ -48,10 +48,12 @@ export async function POST(request: NextRequest) {
 
         // Get questions from jsonData
         let questions: any[] = [];
-        if (material.jsonData?.questions) {
-            questions = material.jsonData.questions;
-        } else if (Array.isArray(material.jsonData)) {
-            questions = material.jsonData;
+        const jsonData = material.jsonData as any;
+
+        if (jsonData?.questions) {
+            questions = jsonData.questions;
+        } else if (Array.isArray(jsonData)) {
+            questions = jsonData;
         }
 
         if (questions.length === 0) {
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
         let correctCount = 0;
         const processedAnswers = answers.map((answer: { questionIndex: number; selectedAnswer: number }) => {
             const question = questions[answer.questionIndex];
-            const isCorrect = question && answer.selectedAnswer === question.correct;
+            const isCorrect = question && Number(answer.selectedAnswer) === Number(question.correct);
             if (isCorrect) correctCount++;
             return {
                 questionIndex: answer.questionIndex,

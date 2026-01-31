@@ -1,7 +1,7 @@
 import WelcomeCard from '@/components/teacher/WelcomeCard';
 import ClassroomSummary from '@/components/teacher/ClassroomSummary';
 import ImpactCard from '@/components/teacher/ImpactCard';
-import RecentCreations from '@/components/teacher/RecentCreations';
+
 import styles from './page.module.css';
 
 export default function TeacherDashboard() {
@@ -14,7 +14,7 @@ export default function TeacherDashboard() {
                     <ClassroomSummary />
                     <ImpactCard />
                 </div>
-                <RecentCreations />
+
             </div>
         </div>
     );
