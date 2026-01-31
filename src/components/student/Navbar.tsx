@@ -20,10 +20,9 @@ import {
 import styles from './Navbar.module.css';
 
 const navLinks = [
-    { href: '/student/dashboard', label: 'Home' },
+    { href: '/student/classroom', label: 'Classroom' },
     { href: '/student/ai-tutor', label: 'AI Tutor' },
     { href: '/student/library', label: 'Library' },
-    { href: '/student/classroom', label: 'Classroom' },
 ];
 
 const notifications = [
@@ -67,7 +66,7 @@ export default function Navbar() {
         <nav className={styles.navbar}>
             <div className={styles.container}>
                 {/* Logo */}
-                <Link href="/student/dashboard" className={styles.logo}>
+                <Link href="/student/classroom" className={styles.logo}>
                     <div className={styles.logoIcon}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10" fill="#3b82f6" />
