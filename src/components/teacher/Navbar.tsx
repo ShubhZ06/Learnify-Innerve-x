@@ -10,9 +10,6 @@ const navLinks = [
     { href: '/teacher/dashboard', label: 'Dashboard' },
     { href: '/teacher/ai-studio', label: 'AI Studio' },
     { href: '/teacher/classes', label: 'Classes' },
-    { href: '/teacher/content', label: 'Content Management' },
-    { href: '/teacher/analytics', label: 'Student Analytics' },
-
 ];
 
 export default function Navbar() {

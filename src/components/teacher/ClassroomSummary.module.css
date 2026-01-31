@@ -1,0 +1,127 @@
+.container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.count {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.viewAllBtn {
+    font-size: 0.8125rem;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.viewAllBtn:hover {
+    text-decoration: underline;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 2rem;
+}
+
+.emptyIcon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.emptyState p {
+    color: #6b7280;
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+}
+
+.createBtn {
+    display: inline-block;
+    background: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.createBtn:hover {
+    background: #2563eb;
+}
+
+.classList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.classCard {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.classCard:hover {
+    background: #f3f4f6;
+}
+
+.classIcon {
+    font-size: 1.5rem;
+}
+
+.classInfo {
+    flex: 1;
+}
+
+.className {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.classCode {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.moreLink {
+    text-align: center;
+    padding: 0.5rem;
+    color: #6b7280;
+    font-size: 0.8125rem;
+    text-decoration: none;
+}
+
+.moreLink:hover {
+    color: #3b82f6;
+}

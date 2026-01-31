@@ -1,8 +1,6 @@
 import WelcomeCard from '@/components/teacher/WelcomeCard';
-import ClassroomManager from '@/components/teacher/ClassroomManager';
-import StorageCard from '@/components/teacher/StorageCard';
+import ClassroomSummary from '@/components/teacher/ClassroomSummary';
 import ImpactCard from '@/components/teacher/ImpactCard';
-import HelpCard from '@/components/teacher/HelpCard';
 import RecentCreations from '@/components/teacher/RecentCreations';
 import styles from './page.module.css';
 
@@ -12,16 +10,12 @@ export default function TeacherDashboard() {
             {/* Main Content Area */}
             <div className={styles.mainContent}>
                 <WelcomeCard />
-                <ClassroomManager />
+                <div className={styles.overviewGrid}>
+                    <ClassroomSummary />
+                    <ImpactCard />
+                </div>
                 <RecentCreations />
             </div>
-
-            {/* Sidebar */}
-            <aside className={styles.sidebar}>
-                <StorageCard />
-                <ImpactCard />
-                <HelpCard />
-            </aside>
         </div>
     );
 }
