@@ -1,3 +1,4 @@
+import { Rocket } from 'lucide-react';
 import styles from './ImpactCard.module.css';
 
 export default function ImpactCard() {
@@ -6,50 +7,56 @@ export default function ImpactCard() {
     const timeSaved = 0;
 
     return (
-        <div className={styles.card}>
-            <h3 className={styles.title}>This Month's Impact</h3>
+        <div className={`${styles.card} animate-scale-in delay-100`}>
+            <h3 className={styles.title}>
+                <span className={styles.titleIconWrapper}>
+                    <Rocket size={20} className={styles.titleIcon} />
+                </span>
+                This Month's Impact
+            </h3>
 
             <div className={styles.stats}>
                 <div className={styles.statItem}>
-                    <div className={styles.statIcon} style={{ background: '#eff6ff' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <rect x="4" y="4" width="16" height="16" rx="2" stroke="#3b82f6" strokeWidth="2" />
-                            <path d="M8 10h8M8 14h5" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+                    <div className={styles.statIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                            <path d="M9 9h6M9 13h6M9 17h4" strokeLinecap="round" />
                         </svg>
                     </div>
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{worksheetsCreated}</span>
-                        <span className={styles.statLabel}>Worksheets Created</span>
+                        <span className={styles.statLabel}>Worksheets</span>
                     </div>
                 </div>
 
                 <div className={styles.statItem}>
-                    <div className={styles.statIcon} style={{ background: '#fef2f2' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="#ef4444" strokeWidth="2" />
-                            <path d="M16 2v4M8 2v4M3 10h18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
+                    <div className={styles.statIcon} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
                         </svg>
                     </div>
                     <div className={styles.statContent}>
-                        <span className={styles.statValue}>{timeSaved} hrs</span>
-                        <span className={styles.statLabel}>Planning Time Saved</span>
+                        <span className={styles.statValue}>{timeSaved}h</span>
+                        <span className={styles.statLabel}>Time Saved</span>
                     </div>
                 </div>
             </div>
 
             <div className={styles.tip}>
                 <div className={styles.tipIcon}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" fill="#a855f7" />
-                        <path d="M12 16v-4M12 8h.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4 4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" />
+                        <path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+                        <path d="M12 14l4-4" strokeLinecap="round" />
                     </svg>
                 </div>
                 <div className={styles.tipContent}>
-                    <span className={styles.tipTitle}>Teacher Tip</span>
-                    <span className={styles.tipText}>Try creating flashcards for vocab!</span>
+                    <span className={styles.tipTitle}>Pro Tip</span>
+                    <span className={styles.tipText}>Create flashcards for vocab!</span>
                 </div>
                 <svg className={styles.tipArrow} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 18l6-6-6-6" />
+                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             </div>
         </div>

@@ -370,7 +370,11 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
+    height: 200px;
+    /* Explicit height */
 }
+
+/* ... */
 
 .chartYAxis {
     display: flex;

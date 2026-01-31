@@ -4,11 +4,24 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import {
+    Flame,
+    Bell,
+    User,
+    Settings,
+    Info,
+    Mail,
+    LogOut,
+    AlertTriangle,
+    CheckCircle,
+    X,
+    Menu
+} from 'lucide-react';
 import styles from './Navbar.module.css';
 
 const navLinks = [
     { href: '/student/dashboard', label: 'Home' },
-    { href: '/student/ai-tutor', label: 'Offline AI Tutor' },
+    { href: '/student/ai-tutor', label: 'AI Tutor' },
     { href: '/student/library', label: 'Library' },
     { href: '/student/classroom', label: 'Classroom' },
 ];
@@ -81,9 +94,9 @@ export default function Navbar() {
                 <div className={styles.rightSection}>
                     {/* Learning Streak */}
                     <div className={styles.streakCounter}>
-                        <span className={styles.streakFlame}>🔥</span>
+                        <span className={styles.streakFlame}><Flame size={20} fill="#f59e0b" strokeWidth={0} /></span>
                         <div className={styles.streakInfo}>
-                            <span className={styles.streakNumber}>0</span>
+                            <span className={styles.streakNumber}>14</span>
                             <span className={styles.streakLabel}>Day Streak</span>
                         </div>
                     </div>
@@ -94,10 +107,7 @@ export default function Navbar() {
                             className={`${styles.iconBtn} ${showNotifications ? styles.active : ''}`}
                             onClick={() => setShowNotifications(!showNotifications)}
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                            </svg>
+                            <Bell size={20} />
                             {unreadCount > 0 && <span className={styles.notifBadge}>{unreadCount}</span>}
                         </button>
 
@@ -114,9 +124,9 @@ export default function Navbar() {
                                         notificationsList.map(notif => (
                                             <div key={notif.id} className={`${styles.notifItem} ${notif.unread ? styles.unread : ''}`}>
                                                 <div className={`${styles.notifIcon} ${styles[notif.type]}`}>
-                                                    {notif.type === 'warning' && '⚠️'}
-                                                    {notif.type === 'info' && 'ℹ️'}
-                                                    {notif.type === 'success' && '✅'}
+                                                    {notif.type === 'warning' && <AlertTriangle size={16} />}
+                                                    {notif.type === 'info' && <Info size={16} />}
+                                                    {notif.type === 'success' && <CheckCircle size={16} />}
                                                 </div>
                                                 <div className={styles.notifContent}>
                                                     <span className={styles.notifTitle}>{notif.title}</span>
@@ -126,8 +136,9 @@ export default function Navbar() {
                                                 <button
                                                     className={styles.dismissBtn}
                                                     onClick={() => dismissNotification(notif.id)}
+                                                    title="Dismiss"
                                                 >
-                                                    ✕
+                                                    <X size={14} />
                                                 </button>
                                             </div>
                                         ))
@@ -169,19 +180,19 @@ export default function Navbar() {
                                 <div className={styles.menuDivider} />
                                 <div className={styles.menuItems}>
                                     <Link href="/student/profile" className={styles.menuItem}>
-                                        <span className={styles.menuIcon}>👤</span>
+                                        <span className={styles.menuIcon}><User size={18} /></span>
                                         <span>My Profile</span>
                                     </Link>
                                     <Link href="/student/settings" className={styles.menuItem}>
-                                        <span className={styles.menuIcon}>⚙️</span>
+                                        <span className={styles.menuIcon}><Settings size={18} /></span>
                                         <span>Settings</span>
                                     </Link>
                                     <Link href="/student/about" className={styles.menuItem}>
-                                        <span className={styles.menuIcon}>ℹ️</span>
+                                        <span className={styles.menuIcon}><Info size={18} /></span>
                                         <span>About Us</span>
                                     </Link>
                                     <Link href="/student/contact" className={styles.menuItem}>
-                                        <span className={styles.menuIcon}>📧</span>
+                                        <span className={styles.menuIcon}><Mail size={18} /></span>
                                         <span>Contact Support</span>
                                     </Link>
                                 </div>
@@ -190,7 +201,7 @@ export default function Navbar() {
                                     className={styles.logoutBtn}
                                     onClick={() => signOut({ callbackUrl: '/login' })}
                                 >
-                                    <span className={styles.menuIcon}>🔌</span>
+                                    <span className={styles.menuIcon}><LogOut size={18} /></span>
                                     <span>Logout</span>
                                 </button>
                             </div>

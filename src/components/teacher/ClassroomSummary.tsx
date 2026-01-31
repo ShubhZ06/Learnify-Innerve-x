@@ -33,22 +33,27 @@ export default function ClassroomSummary() {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} animate-fade-in`}>
             <div className={styles.header}>
                 <div>
-                    <h3 className={styles.title}>My Classrooms</h3>
-                    <span className={styles.count}>{classrooms.length} classes</span>
+                    <span className={styles.title}>My Classrooms</span>
+                    <span className={styles.count}>{classrooms.length}</span>
                 </div>
                 <Link href="/teacher/classes" className={styles.viewAllBtn}>
-                    Manage Classes →
+                    View All
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                 </Link>
             </div>
 
             {isLoading ? (
-                <div className={styles.loading}>Loading...</div>
+                <div className={styles.loading}>
+                    <div className="animate-pulse">Loading classes...</div>
+                </div>
             ) : classrooms.length === 0 ? (
                 <div className={styles.emptyState}>
-                    <span className={styles.emptyIcon}>📚</span>
+                    <span className={styles.emptyIcon}>🏫</span>
                     <p>No classrooms yet</p>
                     <Link href="/teacher/classes" className={styles.createBtn}>
                         Create Your First Class
@@ -56,14 +61,25 @@ export default function ClassroomSummary() {
                 </div>
             ) : (
                 <div className={styles.classList}>
-                    {classrooms.slice(0, 3).map((cls) => (
-                        <div key={cls._id} className={styles.classCard}>
-                            <div className={styles.classIcon}>📘</div>
+                    {classrooms.slice(0, 3).map((cls, index) => (
+                        <Link
+                            href={`/teacher/classes/${cls._id}`}
+                            key={cls._id}
+                            className={`${styles.classCard} animate-slide-up`}
+                            style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                            <div className={styles.classIconWrapper}>📘</div>
                             <div className={styles.classInfo}>
                                 <span className={styles.className}>{cls.name}</span>
-                                <span className={styles.classCode}>Code: {cls.code}</span>
+                                <div className={styles.classMetadata}>
+                                    <span>Code:</span>
+                                    <span className={styles.classCode}>{cls.code}</span>
+                                </div>
                             </div>
-                        </div>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
+                                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </Link>
                     ))}
                     {classrooms.length > 3 && (
                         <Link href="/teacher/classes" className={styles.moreLink}>

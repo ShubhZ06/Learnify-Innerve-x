@@ -3,6 +3,22 @@
 import { useState, useEffect } from 'react';
 import styles from './EnrolledClassrooms.module.css';
 import QuizPlayer from './QuizPlayer';
+import {
+    BookOpen,
+    FileText,
+    BarChart3,
+    Video,
+    File,
+    Folder,
+    Bell,
+    School,
+    GraduationCap,
+    X,
+    Calendar,
+    Star,
+    Library,
+    Target
+} from 'lucide-react';
 
 interface Teacher {
     name: string;
@@ -144,21 +160,22 @@ export default function EnrolledClassrooms() {
     };
 
     const tabs = [
-        { key: 'all' as TabType, label: 'All', icon: '📚', count: materials.all.length },
-        { key: 'quizzes' as TabType, label: 'Quizzes', icon: '📊', count: materials.quizzes.length },
-        { key: 'assignments' as TabType, label: 'Assignments', icon: '📝', count: materials.assignments.length },
-        { key: 'others' as TabType, label: 'Others', icon: '📁', count: materials.others.length },
+        { key: 'all' as TabType, label: 'All', icon: <Library size={18} />, count: materials.all.length },
+        { key: 'quizzes' as TabType, label: 'Quizzes', icon: <BarChart3 size={18} />, count: materials.quizzes.length },
+        { key: 'assignments' as TabType, label: 'Assignments', icon: <FileText size={18} />, count: materials.assignments.length },
+        { key: 'others' as TabType, label: 'Others', icon: <Folder size={18} />, count: materials.others.length },
     ];
 
     const getMaterialIcon = (type: string) => {
+        const size = 20;
         switch (type) {
-            case 'announcement': return '📢';
-            case 'assignment': return '📝';
-            case 'quiz': return '📊';
-            case 'video': return '🎥';
-            case 'article': return '📄';
-            case 'resource': return '📁';
-            default: return '📚';
+            case 'announcement': return <Bell size={size} />;
+            case 'assignment': return <FileText size={size} />;
+            case 'quiz': return <BarChart3 size={size} />;
+            case 'video': return <Video size={size} />;
+            case 'article': return <File size={size} />;
+            case 'resource': return <Folder size={size} />;
+            default: return <BookOpen size={size} />;
         }
     };
 
@@ -167,7 +184,7 @@ export default function EnrolledClassrooms() {
     }
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} animate-fade-in`}>
             <div className={styles.header}>
                 <h3 className={styles.title}>My Classrooms</h3>
                 <span className={styles.count}>{enrollments.length} enrolled</span>
@@ -176,7 +193,7 @@ export default function EnrolledClassrooms() {
             {/* Join Classroom Form */}
             <form onSubmit={handleJoinClass} className={styles.joinForm}>
                 <div className={styles.joinInputWrapper}>
-                    <span className={styles.joinIcon}>🏫</span>
+                    <span className={styles.joinIcon}><School size={20} /></span>
                     <input
                         type="text"
                         value={classCode}
@@ -191,23 +208,32 @@ export default function EnrolledClassrooms() {
                         className={styles.joinBtn}
                         disabled={!classCode.trim() || isJoining}
                     >
-                        {isJoining ? 'Joining...' : 'Join'}
+                        {isJoining ? 'Joining...' : 'Join Class'}
                     </button>
                 </div>
-                {joinError && <div className={styles.errorMessage}>{joinError}</div>}
+                {joinError && (
+                    <div className={`${styles.errorMessage} animate-slide-up`}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        {joinError}
+                    </div>
+                )}
             </form>
 
             {/* Enrolled Classrooms */}
             {enrollments.length === 0 ? (
                 <div className={styles.emptyState}>
-                    <div className={styles.emptyIcon}>📚</div>
+                    <div className={styles.emptyIcon}><BookOpen size={48} /></div>
                     <p>No classrooms yet. Enter a code above to join!</p>
                 </div>
             ) : (
                 <div className={styles.grid}>
                     {enrollments.map((item) => (
                         <div key={item.enrollmentId} className={styles.card}>
-                            <div className={styles.cardIcon}>📘</div>
+                            <div className={styles.cardIcon}><School size={24} /></div>
                             <div className={styles.cardInfo}>
                                 <h4 className={styles.className}>{item.classroom?.name || 'Unknown Class'}</h4>
                                 <p className={styles.teacherName}>
@@ -232,14 +258,17 @@ export default function EnrolledClassrooms() {
             {selectedClassroom && (
                 <div className={styles.modalOverlay} onClick={closeModal}>
                     <div className={styles.modalLarge} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.closeBtn} onClick={closeModal}>×</button>
+                        <button className={styles.closeBtn} onClick={closeModal}><X size={24} /></button>
 
                         <div className={styles.modalHeader}>
-                            <div className={styles.modalIcon}>📘</div>
+                            <div className={styles.modalIcon}><School size={32} /></div>
                             <div className={styles.modalHeaderInfo}>
                                 <h2 className={styles.modalTitle}>{selectedClassroom.classroom?.name}</h2>
                                 <p className={styles.modalSubtitle}>
-                                    👨‍🏫 {selectedClassroom.classroom?.teacherId?.name || 'Unknown Teacher'}
+                                    <span className="inline-flex items-center gap-2">
+                                        <GraduationCap size={16} />
+                                        {selectedClassroom.classroom?.teacherId?.name || 'Unknown Teacher'}
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -280,12 +309,14 @@ export default function EnrolledClassrooms() {
                                                 <p className={styles.materialDesc}>{material.description}</p>
                                                 {material.dueDate && (
                                                     <span className={styles.materialDue}>
-                                                        📅 Due: {new Date(material.dueDate).toLocaleDateString()}
+                                                        <Calendar size={14} className="inline mr-1" />
+                                                        Due: {new Date(material.dueDate).toLocaleDateString()}
                                                     </span>
                                                 )}
                                                 {material.points && (
                                                     <span className={styles.materialPoints}>
-                                                        ⭐ {material.points} points
+                                                        <Star size={14} className="inline mr-1" />
+                                                        {material.points} points
                                                     </span>
                                                 )}
                                             </div>
@@ -301,7 +332,7 @@ export default function EnrolledClassrooms() {
                             ) : (
                                 <div className={styles.emptyMaterials}>
                                     <div className={styles.emptyMaterialsIcon}>
-                                        {tabs.find(t => t.key === activeTab)?.icon || '📚'}
+                                        {tabs.find(t => t.key === activeTab)?.icon || <BookOpen size={32} />}
                                     </div>
                                     <h3>No {activeTab === 'all' ? 'materials' : activeTab} yet</h3>
                                     <p>
@@ -324,7 +355,7 @@ export default function EnrolledClassrooms() {
                             className={styles.closeBtn}
                             onClick={() => setSelectedMaterial(null)}
                         >
-                            ×
+                            <X size={24} />
                         </button>
 
                         <div className={styles.contentHeader}>
@@ -348,10 +379,10 @@ export default function EnrolledClassrooms() {
                         {(selectedMaterial.dueDate || selectedMaterial.points) && (
                             <div className={styles.contentDetails}>
                                 {selectedMaterial.dueDate && (
-                                    <span>📅 Due: {new Date(selectedMaterial.dueDate).toLocaleDateString()}</span>
+                                    <span><Calendar size={14} className="inline mr-1" /> Due: {new Date(selectedMaterial.dueDate).toLocaleDateString()}</span>
                                 )}
                                 {selectedMaterial.points && (
-                                    <span>⭐ {selectedMaterial.points} points</span>
+                                    <span><Star size={14} className="inline mr-1" /> {selectedMaterial.points} points</span>
                                 )}
                             </div>
                         )}
@@ -393,7 +424,8 @@ export default function EnrolledClassrooms() {
                                     return (
                                         <div className={styles.quizContent}>
                                             <h4 className={styles.quizTitle}>
-                                                📝 {parsedContent.questions.length} Questions
+                                                <FileText className="inline mr-2" size={20} />
+                                                {parsedContent.questions.length} Questions
                                             </h4>
                                             <p style={{ color: '#64748b', marginBottom: '20px' }}>
                                                 Answer each question and get instant feedback. Your results will be saved.
@@ -402,7 +434,8 @@ export default function EnrolledClassrooms() {
                                                 className={styles.startQuizBtn}
                                                 onClick={() => setIsPlayingQuiz(true)}
                                             >
-                                                🎯 Start Quiz
+                                                <Target className="inline mr-2" size={16} />
+                                                Start Quiz
                                             </button>
                                         </div>
                                     );
@@ -435,7 +468,8 @@ export default function EnrolledClassrooms() {
                             {selectedMaterial.videoUrl && (
                                 <div className={styles.videoEmbed}>
                                     <a href={selectedMaterial.videoUrl} target="_blank" rel="noopener noreferrer">
-                                        🎥 Watch Video
+                                        <Video className="inline mr-2" size={18} />
+                                        Watch Video
                                     </a>
                                 </div>
                             )}
@@ -443,7 +477,8 @@ export default function EnrolledClassrooms() {
                             {selectedMaterial.fileUrl && (
                                 <div className={styles.fileDownload}>
                                     <a href={selectedMaterial.fileUrl} target="_blank" rel="noopener noreferrer">
-                                        📁 Download File
+                                        <Folder className="inline mr-2" size={18} />
+                                        Download File
                                     </a>
                                 </div>
                             )}

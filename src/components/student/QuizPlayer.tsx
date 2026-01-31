@@ -1,6 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import {
+    Check,
+    X,
+    Award,
+    ThumbsUp,
+    BookOpen,
+    PartyPopper,
+    ArrowRight,
+    ArrowLeft,
+    CheckCircle,
+    XCircle
+} from 'lucide-react';
 import styles from './QuizPlayer.module.css';
 
 interface Question {
@@ -112,10 +124,16 @@ export default function QuizPlayer({
 
     if (quizComplete && finalResult) {
         return (
-            <div className={styles.container}>
+            <div className={`${styles.container} animate-fade-in`}>
                 <div className={styles.resultsCard}>
                     <div className={styles.resultsEmoji}>
-                        {finalResult.percentage >= 80 ? '🎉' : finalResult.percentage >= 60 ? '👍' : '📚'}
+                        {finalResult.percentage >= 80 ? (
+                            <PartyPopper size={64} className="text-yellow-500" />
+                        ) : finalResult.percentage >= 60 ? (
+                            <ThumbsUp size={64} className="text-blue-500" />
+                        ) : (
+                            <BookOpen size={64} className="text-purple-500" />
+                        )}
                     </div>
                     <h2 className={styles.resultsTitle}>
                         {finalResult.percentage >= 80 ? 'Excellent!' : finalResult.percentage >= 60 ? 'Good Job!' : 'Keep Practicing!'}
@@ -126,15 +144,15 @@ export default function QuizPlayer({
                     </div>
                     <div className={styles.scoreDetails}>
                         <div className={styles.scoreItem}>
-                            <span>✅ Correct:</span>
+                            <span className="flex items-center gap-2"><CheckCircle size={18} className="text-green-500" /> Correct:</span>
                             <strong>{finalResult.score}</strong>
                         </div>
                         <div className={styles.scoreItem}>
-                            <span>❌ Incorrect:</span>
+                            <span className="flex items-center gap-2"><XCircle size={18} className="text-red-500" /> Incorrect:</span>
                             <strong>{finalResult.total - finalResult.score}</strong>
                         </div>
                     </div>
-                    <p className={styles.savedMessage}>✓ Your result has been saved!</p>
+                    <p className={styles.savedMessage}><Check size={16} className="inline mr-1" /> Your result has been saved!</p>
                     <button className={styles.closeBtn} onClick={onClose}>
                         Close
                     </button>
@@ -144,7 +162,7 @@ export default function QuizPlayer({
     }
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} animate-fade-in`}>
             <div className={styles.header}>
                 <h3 className={styles.title}>{title}</h3>
                 <div className={styles.progress}>
@@ -176,15 +194,21 @@ export default function QuizPlayer({
                         >
                             <span className={styles.optionLetter}>{String.fromCharCode(65 + idx)}</span>
                             <span className={styles.optionText}>{option}</span>
-                            {showResult && idx === question.correct && <span className={styles.checkIcon}>✓</span>}
-                            {showResult && selectedAnswer === idx && idx !== question.correct && <span className={styles.wrongIcon}>✗</span>}
+                            {showResult && idx === question.correct && <Check size={20} className={styles.checkIcon} />}
+                            {showResult && selectedAnswer === idx && idx !== question.correct && <X size={20} className={styles.wrongIcon} />}
                         </button>
                     ))}
                 </div>
 
                 {showResult && question.explanation && (
                     <div className={`${styles.explanation} ${selectedAnswer === question.correct ? styles.correctExp : styles.incorrectExp}`}>
-                        <strong>{selectedAnswer === question.correct ? '✅ Correct!' : '❌ Incorrect'}</strong>
+                        <div className="flex items-center gap-2 font-bold mb-1">
+                            {selectedAnswer === question.correct ? (
+                                <><CheckCircle size={18} /> Correct!</>
+                            ) : (
+                                <><XCircle size={18} /> Incorrect</>
+                            )}
+                        </div>
                         <p>{question.explanation}</p>
                     </div>
                 )}
@@ -196,7 +220,7 @@ export default function QuizPlayer({
                     onClick={handlePrevious}
                     disabled={currentQuestion === 0}
                 >
-                    ← Previous
+                    <ArrowLeft size={16} /> Previous
                 </button>
 
                 <div className={styles.questionDots}>
@@ -223,7 +247,7 @@ export default function QuizPlayer({
                         onClick={handleCheckAnswer}
                         disabled={selectedAnswer === null}
                     >
-                        Check
+                        Check <Check size={16} />
                     </button>
                 ) : (
                     <button
@@ -231,7 +255,7 @@ export default function QuizPlayer({
                         onClick={handleNext}
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? 'Submitting...' : currentQuestion === questions.length - 1 ? 'Finish' : 'Next →'}
+                        {isSubmitting ? 'Submitting...' : currentQuestion === questions.length - 1 ? 'Finish' : 'Next'} <ArrowRight size={16} />
                     </button>
                 )}
             </div>
