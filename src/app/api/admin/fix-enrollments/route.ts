@@ -31,7 +31,7 @@ export async function POST(req: Request) {
             console.log(`Enrollment ${enrollment._id}: studentId type = ${studentIdType}`);
 
             // If it's stored as string, we need to check if it matches our user
-            if (studentIdType === 'string' && enrollment.studentId === session.user.id) {
+            if (studentIdType === 'string' && (enrollment.studentId as any) === session.user.id) {
                 // Delete this enrollment and recreate with ObjectId
                 await Enrollment.findByIdAndDelete(enrollment._id);
                 const newEnrollment = new Enrollment({

@@ -5,9 +5,10 @@ import Classroom from '@/models/Classroom';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { classroomId: string } }
+    { params }: { params: Promise<{ classroomId: string }> }
 ) {
     try {
+        const { classroomId } = await params;
         const session = await auth();
 
         if (!session?.user?.email) {
@@ -20,7 +21,7 @@ export async function GET(
         await dbConnect();
 
         // Fetch classroom details with teacher info
-        const classroom = await Classroom.findById(params.classroomId)
+        const classroom = await Classroom.findById(classroomId)
             .populate('teacherId', 'name email')
             .lean();
 

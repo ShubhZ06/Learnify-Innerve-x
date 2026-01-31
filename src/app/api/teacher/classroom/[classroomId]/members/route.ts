@@ -6,7 +6,7 @@ import User from "@/models/User";
 
 export async function GET(
     req: Request,
-    { params }: { params: { classroomId: string } }
+    { params }: { params: Promise<{ classroomId: string }> }
 ) {
     try {
         const session = await auth();
