@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/student/Navbar';
+import MaterialModal from '@/components/student/MaterialModal';
 import styles from './page.module.css';
 
 interface Classroom {
@@ -16,17 +17,52 @@ interface Classroom {
     joinedAt: string;
 }
 
+interface Material {
+    _id: string;
+    type: 'quiz' | 'assignment' | 'video' | 'article' | 'resource' | 'announcement';
+    title: string;
+    description: string;
+    content?: string;
+    jsonData?: any;
+    teacher?: { name: string; email: string };
+    createdAt: string;
+    dueDate?: string;
+    points?: number;
+}
+
+const materialIcons: Record<string, string> = {
+    quiz: '📊',
+    assignment: '📝',
+    video: '🎥',
+    article: '📄',
+    resource: '📚',
+    announcement: '📢'
+};
+
+const materialColors: Record<string, string> = {
+    quiz: '#3b82f6',
+    assignment: '#f59e0b',
+    video: '#ef4444',
+    article: '#8b5cf6',
+    resource: '#22c55e',
+    announcement: '#06b6d4'
+};
+
 export default function ClassroomPage() {
     const params = useParams();
     const router = useRouter();
     const classroomId = params.classroomId as string;
 
     const [classroom, setClassroom] = useState<Classroom | null>(null);
+    const [materials, setMaterials] = useState<Material[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
+    const [activeFilter, setActiveFilter] = useState<string>('all');
 
     useEffect(() => {
         fetchClassroomData();
+        fetchMaterials();
     }, [classroomId]);
 
     const fetchClassroomData = async () => {
@@ -48,6 +84,31 @@ export default function ClassroomPage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const fetchMaterials = async () => {
+        try {
+            const response = await fetch(`/api/student/classroom/${classroomId}/materials`);
+            if (response.ok) {
+                const data = await response.json();
+                setMaterials(data.materials?.all || []);
+            }
+        } catch (err) {
+            console.error('Failed to fetch materials:', err);
+        }
+    };
+
+    const filteredMaterials = activeFilter === 'all'
+        ? materials
+        : materials.filter(m => m.type === activeFilter);
+
+    const filterCounts = {
+        all: materials.length,
+        quiz: materials.filter(m => m.type === 'quiz').length,
+        assignment: materials.filter(m => m.type === 'assignment').length,
+        article: materials.filter(m => m.type === 'article').length,
+        resource: materials.filter(m => m.type === 'resource').length,
+        announcement: materials.filter(m => m.type === 'announcement').length,
     };
 
     if (isLoading) {
@@ -84,7 +145,7 @@ export default function ClassroomPage() {
             <div className={styles.container}>
                 {/* Header */}
                 <div className={styles.header}>
-                    <button onClick={() => router.push('/student/classroom')} className={styles.backButton}>
+                    <button onClick={() => router.push('/student/practice')} className={styles.backButton}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M19 12H5M12 19l-7-7 7-7" />
                         </svg>
@@ -114,15 +175,92 @@ export default function ClassroomPage() {
                     )}
                 </div>
 
-                {/* Empty Content - Materials Removed */}
+                {/* Filters */}
+                <div className={styles.filters}>
+                    {Object.entries(filterCounts).map(([type, count]) => (
+                        <button
+                            key={type}
+                            className={`${styles.filterBtn} ${activeFilter === type ? styles.activeFilter : ''}`}
+                            onClick={() => setActiveFilter(type)}
+                        >
+                            {type === 'all' ? '📋' : materialIcons[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
+                            <span className={styles.filterCount}>{count}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Content */}
                 <div className={styles.content}>
-                    <div className={styles.emptyState}>
-                        <div className={styles.emptyIcon}>📚</div>
-                        <h3>Welcome to the Classroom!</h3>
-                        <p>This classroom is ready for learning. Materials will appear here when added by your teacher.</p>
-                    </div>
+                    {filteredMaterials.length === 0 ? (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>📚</div>
+                            <h3>No Materials Yet</h3>
+                            <p>Materials will appear here when your teacher adds them.</p>
+                        </div>
+                    ) : (
+                        <div className={styles.materialsGrid}>
+                            {filteredMaterials.map((material) => (
+                                <div
+                                    key={material._id}
+                                    className={styles.materialCard}
+                                    onClick={() => setSelectedMaterial(material)}
+                                >
+                                    <div
+                                        className={styles.materialIcon}
+                                        style={{ backgroundColor: `${materialColors[material.type]}15` }}
+                                    >
+                                        <span style={{ color: materialColors[material.type] }}>
+                                            {materialIcons[material.type]}
+                                        </span>
+                                    </div>
+                                    <div className={styles.materialContent}>
+                                        <div className={styles.materialHeader}>
+                                            <h3 className={styles.materialTitle}>{material.title}</h3>
+                                            <span
+                                                className={styles.materialType}
+                                                style={{
+                                                    backgroundColor: `${materialColors[material.type]}20`,
+                                                    color: materialColors[material.type]
+                                                }}
+                                            >
+                                                {material.type}
+                                            </span>
+                                        </div>
+                                        <p className={styles.materialDesc}>{material.description}</p>
+                                        <div className={styles.materialMeta}>
+                                            <span className={styles.materialDate}>
+                                                {new Date(material.createdAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                            </span>
+                                            {material.dueDate && (
+                                                <span className={styles.materialDue}>
+                                                    Due: {new Date(material.dueDate).toLocaleDateString()}
+                                                </span>
+                                            )}
+                                            {material.points && (
+                                                <span className={styles.materialPoints}>
+                                                    ⭐ {material.points} pts
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={styles.materialArrow}>→</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {/* Material Modal */}
+            {selectedMaterial && (
+                <MaterialModal
+                    material={selectedMaterial}
+                    onClose={() => setSelectedMaterial(null)}
+                />
+            )}
         </div>
     );
 }

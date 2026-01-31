@@ -6,9 +6,10 @@ import mongoose from 'mongoose';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { classroomId: string } }
+    { params }: { params: Promise<{ classroomId: string }> }
 ) {
     try {
+        const { classroomId } = await params;
         const session = await auth();
 
         if (!session?.user?.email) {
@@ -23,7 +24,7 @@ export async function GET(
         // Convert classroomId to ObjectId for proper matching
         let classroomObjId;
         try {
-            classroomObjId = new mongoose.Types.ObjectId(params.classroomId);
+            classroomObjId = new mongoose.Types.ObjectId(classroomId);
         } catch (e) {
             return NextResponse.json(
                 { error: 'Invalid classroom ID' },
@@ -32,7 +33,7 @@ export async function GET(
         }
 
         // Debug: Log the query
-        console.log('Fetching materials for classroom:', params.classroomId);
+        console.log('Fetching materials for classroom:', classroomId);
 
         // Fetch all published materials for this classroom
         const materials = await Material.find({
