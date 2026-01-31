@@ -100,15 +100,15 @@ export default function ClassroomPage() {
 
     const filteredMaterials = activeFilter === 'all'
         ? materials
-        : materials.filter(m => m.type === activeFilter);
+        : activeFilter === 'others'
+            ? materials.filter(m => !['quiz', 'assignment'].includes(m.type))
+            : materials.filter(m => m.type === activeFilter);
 
     const filterCounts = {
         all: materials.length,
         quiz: materials.filter(m => m.type === 'quiz').length,
         assignment: materials.filter(m => m.type === 'assignment').length,
-        article: materials.filter(m => m.type === 'article').length,
-        resource: materials.filter(m => m.type === 'resource').length,
-        announcement: materials.filter(m => m.type === 'announcement').length,
+        others: materials.filter(m => !['quiz', 'assignment'].includes(m.type)).length,
     };
 
     if (isLoading) {
@@ -177,16 +177,30 @@ export default function ClassroomPage() {
 
                 {/* Filters */}
                 <div className={styles.filters}>
-                    {Object.entries(filterCounts).map(([type, count]) => (
-                        <button
-                            key={type}
-                            className={`${styles.filterBtn} ${activeFilter === type ? styles.activeFilter : ''}`}
-                            onClick={() => setActiveFilter(type)}
-                        >
-                            {type === 'all' ? '📋' : materialIcons[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
-                            <span className={styles.filterCount}>{count}</span>
-                        </button>
-                    ))}
+                    {Object.entries(filterCounts).map(([type, count]) => {
+                        const icons: Record<string, string> = {
+                            all: '📋',
+                            quiz: '📊',
+                            assignment: '📝',
+                            others: '📚'
+                        };
+                        const labels: Record<string, string> = {
+                            all: 'All',
+                            quiz: 'Quizzes',
+                            assignment: 'Assignments',
+                            others: 'Others'
+                        };
+                        return (
+                            <button
+                                key={type}
+                                className={`${styles.filterBtn} ${activeFilter === type ? styles.activeFilter : ''}`}
+                                onClick={() => setActiveFilter(type)}
+                            >
+                                {icons[type]} {labels[type]}
+                                <span className={styles.filterCount}>{count}</span>
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Content */}

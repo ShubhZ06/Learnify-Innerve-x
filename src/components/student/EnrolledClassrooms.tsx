@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './EnrolledClassrooms.module.css';
+import QuizPlayer from './QuizPlayer';
 
 interface Teacher {
     name: string;
@@ -43,13 +44,10 @@ interface MaterialsData {
     all: Material[];
     assignments: Material[];
     quizzes: Material[];
-    videos: Material[];
-    articles: Material[];
-    resources: Material[];
-    announcements: Material[];
+    others: Material[];
 }
 
-type TabType = 'all' | 'assignments' | 'quizzes' | 'videos' | 'articles' | 'resources' | 'announcements';
+type TabType = 'all' | 'quizzes' | 'assignments' | 'others';
 
 export default function EnrolledClassrooms() {
     const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -61,11 +59,12 @@ export default function EnrolledClassrooms() {
     // Modal state
     const [selectedClassroom, setSelectedClassroom] = useState<Enrollment | null>(null);
     const [materials, setMaterials] = useState<MaterialsData>({
-        all: [], assignments: [], quizzes: [], videos: [], articles: [], resources: [], announcements: []
+        all: [], quizzes: [], assignments: [], others: []
     });
     const [activeTab, setActiveTab] = useState<TabType>('all');
     const [isLoadingMaterials, setIsLoadingMaterials] = useState(false);
     const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
+    const [isPlayingQuiz, setIsPlayingQuiz] = useState(false);
 
     useEffect(() => {
         fetchEnrollments();
@@ -124,7 +123,13 @@ export default function EnrolledClassrooms() {
             const response = await fetch(`/api/student/classroom/${enrollment.classroom._id}/materials`);
             if (response.ok) {
                 const data = await response.json();
-                setMaterials(data.materials);
+                const allMats = data.materials?.all || [];
+                setMaterials({
+                    all: allMats,
+                    quizzes: allMats.filter((m: Material) => m.type === 'quiz'),
+                    assignments: allMats.filter((m: Material) => m.type === 'assignment'),
+                    others: allMats.filter((m: Material) => !['quiz', 'assignment'].includes(m.type))
+                });
             }
         } catch (error) {
             console.error('Error fetching materials:', error);
@@ -135,17 +140,14 @@ export default function EnrolledClassrooms() {
 
     const closeModal = () => {
         setSelectedClassroom(null);
-        setMaterials({ all: [], assignments: [], quizzes: [], videos: [], articles: [], resources: [], announcements: [] });
+        setMaterials({ all: [], quizzes: [], assignments: [], others: [] });
     };
 
     const tabs = [
         { key: 'all' as TabType, label: 'All', icon: '📚', count: materials.all.length },
-        { key: 'announcements' as TabType, label: 'Announcements', icon: '📢', count: materials.announcements.length },
-        { key: 'assignments' as TabType, label: 'Assignments', icon: '📝', count: materials.assignments.length },
         { key: 'quizzes' as TabType, label: 'Quizzes', icon: '📊', count: materials.quizzes.length },
-        { key: 'videos' as TabType, label: 'Videos', icon: '🎥', count: materials.videos.length },
-        { key: 'articles' as TabType, label: 'Articles', icon: '📄', count: materials.articles.length },
-        { key: 'resources' as TabType, label: 'Resources', icon: '📁', count: materials.resources.length },
+        { key: 'assignments' as TabType, label: 'Assignments', icon: '📝', count: materials.assignments.length },
+        { key: 'others' as TabType, label: 'Others', icon: '📁', count: materials.others.length },
     ];
 
     const getMaterialIcon = (type: string) => {
@@ -368,38 +370,40 @@ export default function EnrolledClassrooms() {
                                     }
                                 }
 
-                                // Render quiz questions nicely
+                                // Render quiz with interactive player
                                 if (parsedContent?.questions && Array.isArray(parsedContent.questions)) {
+                                    if (isPlayingQuiz) {
+                                        return (
+                                            <QuizPlayer
+                                                materialId={selectedMaterial._id}
+                                                classroomId={selectedClassroom?.classroom._id || ''}
+                                                title={selectedMaterial.title}
+                                                questions={parsedContent.questions}
+                                                onComplete={(result) => {
+                                                    console.log('Quiz completed:', result);
+                                                }}
+                                                onClose={() => {
+                                                    setIsPlayingQuiz(false);
+                                                    setSelectedMaterial(null);
+                                                }}
+                                            />
+                                        );
+                                    }
+
                                     return (
                                         <div className={styles.quizContent}>
                                             <h4 className={styles.quizTitle}>
                                                 📝 {parsedContent.questions.length} Questions
                                             </h4>
-                                            {parsedContent.questions.map((q: any, idx: number) => (
-                                                <div key={idx} className={styles.questionCard}>
-                                                    <div className={styles.questionHeader}>
-                                                        <span className={styles.questionNumber}>Q{idx + 1}</span>
-                                                        <span className={styles.questionText}>{q.question}</span>
-                                                    </div>
-                                                    {q.options && (
-                                                        <div className={styles.optionsList}>
-                                                            {q.options.map((opt: string, oidx: number) => (
-                                                                <div key={oidx} className={styles.optionItem}>
-                                                                    <span className={styles.optionLetter}>
-                                                                        {String.fromCharCode(65 + oidx)}
-                                                                    </span>
-                                                                    <span>{opt}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {q.correctAnswer && (
-                                                        <div className={styles.correctAnswer}>
-                                                            ✓ Answer: {q.correctAnswer}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
+                                            <p style={{ color: '#64748b', marginBottom: '20px' }}>
+                                                Answer each question and get instant feedback. Your results will be saved.
+                                            </p>
+                                            <button
+                                                className={styles.startQuizBtn}
+                                                onClick={() => setIsPlayingQuiz(true)}
+                                            >
+                                                🎯 Start Quiz
+                                            </button>
                                         </div>
                                     );
                                 }

@@ -799,3 +799,23 @@
     font-weight: 500;
     color: #047857;
 }
+
+.startQuizBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.startQuizBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.35);
+}
